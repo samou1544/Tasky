@@ -2,7 +2,7 @@ package com.asma.tasky.authentication.domain.use_case
 
 import com.asma.tasky.authentication.domain.model.LoginResult
 import com.asma.tasky.authentication.domain.repository.AuthenticationRepository
-import com.asma.tasky.authentication.presentation.util.AuthError
+import com.asma.tasky.authentication.domain.util.AuthError
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(

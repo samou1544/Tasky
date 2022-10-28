@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asma.tasky.authentication.domain.use_case.LoginUseCase
+import com.asma.tasky.authentication.domain.util.Validation
 import com.asma.tasky.common.Resource
 import com.asma.tasky.core.domain.states.TextFieldState
 import com.asma.tasky.core.presentation.util.UiEvent
@@ -39,18 +40,28 @@ class RegisterViewModel @Inject constructor(
 
         when (event) {
             is RegisterEvent.NameEntered -> {
-                _emailState.value = emailState.value.copy(
-                    text = event.name
+                val name = event.name
+                val nameError = Validation.validateName(name)
+                _nameState.value = TextFieldState(
+                    text = name,
+                    error = nameError
                 )
+
             }
             is RegisterEvent.EmailEntered -> {
-                _emailState.value = emailState.value.copy(
-                    text = event.email
+                val email = event.email
+                val emailError = Validation.validateEmail(email)
+                _emailState.value = TextFieldState(
+                    text = email,
+                    error = emailError
                 )
             }
             is RegisterEvent.PasswordEntered -> {
-                _passwordState.value = passwordState.value.copy(
-                    text = event.password
+                val password = event.password
+                val passwordError = Validation.validatePassword(password)
+                _passwordState.value = TextFieldState(
+                    text = password,
+                    error = passwordError
                 )
             }
             is RegisterEvent.TogglePasswordVisibility -> {

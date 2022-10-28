@@ -1,6 +1,6 @@
 package com.asma.tasky.authentication.domain.model
 
-import com.asma.tasky.authentication.presentation.util.AuthError
+import com.asma.tasky.authentication.domain.util.AuthError
 import com.asma.tasky.common.Resource
 
 data class LoginResult(

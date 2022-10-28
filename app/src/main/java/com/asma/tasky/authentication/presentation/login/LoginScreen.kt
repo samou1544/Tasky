@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
 import com.asma.tasky.authentication.presentation.components.FormTextField
-import com.asma.tasky.authentication.presentation.util.AuthError
+import com.asma.tasky.authentication.domain.util.AuthError
 import com.asma.tasky.core.presentation.ui.theme.*
 import com.asma.tasky.core.util.Screen
 

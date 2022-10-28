@@ -1,32 +1,34 @@
 package com.asma.tasky.authentication.presentation.register
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
+import com.asma.tasky.authentication.domain.util.AuthError
 import com.asma.tasky.authentication.presentation.components.FormTextField
-import com.asma.tasky.authentication.presentation.util.AuthError
-import com.asma.tasky.core.presentation.ui.theme.*
+import com.asma.tasky.core.presentation.ui.theme.LightGray
+import com.asma.tasky.core.presentation.ui.theme.SpaceExtraLarge
+import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
+import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
 
 @Composable
 fun RegisterScreen(
-    viewModel: RegisterViewModel = hiltViewModel()
+    viewModel: RegisterViewModel = hiltViewModel(),
+    onNavigate: (String?) -> (Unit) = {}
 ) {
     val emailState = viewModel.emailState.value
     val nameState = viewModel.nameState.value
@@ -79,13 +81,17 @@ fun RegisterScreen(
                     keyboardType = KeyboardType.Text,
                     error = when (emailState.error) {
                         is AuthError.FieldEmpty -> stringResource(id = R.string.error_field_empty)
+                        is AuthError.InputTooShort -> stringResource(id = R.string.error_input_short)
+                        is AuthError.InputTooLong -> stringResource(id = R.string.error_input_long)
                         else -> ""
                     },
-                    hint = stringResource(id = R.string.name_hint)
+                    hint = stringResource(id = R.string.name_hint),
+                    isCheckMarkDisplayed = state.isNameValid == true
+
                 )
                 Spacer(modifier = Modifier.height(SpaceMedium))
-                FormTextField(
 
+                FormTextField(
                     backgroundColor = LightGray,
                     text = emailState.text,
                     onValueChange = {
@@ -94,9 +100,11 @@ fun RegisterScreen(
                     keyboardType = KeyboardType.Email,
                     error = when (emailState.error) {
                         is AuthError.FieldEmpty -> stringResource(id = R.string.error_field_empty)
+                        is AuthError.InvalidEmail -> stringResource(id = R.string.error_invalid_email)
                         else -> ""
                     },
-                    hint = stringResource(id = R.string.login_hint)
+                    hint = stringResource(id = R.string.login_hint),
+                    isCheckMarkDisplayed = state.isEmailValid == true
                 )
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 FormTextField(
@@ -108,13 +116,16 @@ fun RegisterScreen(
                     keyboardType = KeyboardType.Password,
                     error = when (passwordState.error) {
                         is AuthError.FieldEmpty -> stringResource(id = R.string.error_field_empty)
+                        is AuthError.InputTooShort -> stringResource(id = R.string.error_password_short)
+                        is AuthError.InvalidPassword -> stringResource(id = R.string.error_invalid_password)
                         else -> ""
                     },
                     isPasswordVisible = state.isPasswordVisible,
                     backgroundColor = LightGray,
                     onPasswordToggleClick = {
                         viewModel.onEvent(RegisterEvent.TogglePasswordVisibility)
-                    }
+                    },
+                    isCheckMarkDisplayed = state.isPasswordValid == true
                 )
                 Spacer(modifier = Modifier.height(SpaceLarge))
                 Button(
@@ -132,27 +143,25 @@ fun RegisterScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
             }
-            Text(
-                text = buildAnnotatedString {
-                    append(stringResource(id = R.string.dont_have_an_account))
-                    append(" ")
-                    val signUpText = stringResource(id = R.string.sign_up)
-                    withStyle(
-                        style = SpanStyle(
-                            color = LightPurple
-                        )
-                    ) {
-                        append(signUpText)
-                    }
-                },
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier
-                    .padding(bottom = SpaceExtraLarge)
-                    .align(Alignment.BottomCenter)
-                    .clickable {
 
-                    }
-            )
+            Button(
+                onClick = { onNavigate(null) },
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(bottom = SpaceExtraLarge, start = SpaceLarge)
+                    .align(Alignment.BottomStart),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Black,
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Icon(
+                    Icons.Filled.KeyboardArrowLeft,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
         }
     }
 }
