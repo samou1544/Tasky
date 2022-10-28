@@ -1,10 +1,12 @@
 package com.asma.tasky.authentication.data.repository
 
+import com.asma.tasky.R
 import com.asma.tasky.authentication.data.remote.AuthenticationApi
 import com.asma.tasky.authentication.data.remote.request.LoginRequest
 import com.asma.tasky.authentication.data.remote.request.RegistrationRequest
 import com.asma.tasky.authentication.domain.repository.AuthenticationRepository
 import com.asma.tasky.common.Resource
+import com.asma.tasky.core.util.UiText
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -18,11 +20,12 @@ class AuthenticationRepositoryImpl(
         return try {
             val result = api.register(request = registrationRequest)
             if (result.isSuccessful) Resource.Success(Unit)
-            else Resource.Error(result.message() ?: "Unknown Error")
+            else Resource.Error(UiText.DynamicString(result.message()))
+
         } catch (e: IOException) {
-            Resource.Error("Network error. Check your internet connection")
+            Resource.Error(UiText.StringResource(R.string.netword_error))
         } catch (e: HttpException) {
-            Resource.Error("Something went wrong. Try again later")
+            Resource.Error(UiText.StringResource(R.string.something_wrong))
         }
     }
 
@@ -33,11 +36,11 @@ class AuthenticationRepositoryImpl(
             if (result.isSuccessful) {
                 //todo save token locally
                 Resource.Success(Unit)
-            } else Resource.Error(result.message() ?: "Unknown Error")
+            } else Resource.Error(UiText.DynamicString(result.message()))
         } catch (e: IOException) {
-            Resource.Error("Network error. Check your internet connection")
+            Resource.Error(UiText.StringResource(R.string.netword_error))
         } catch (e: HttpException) {
-            Resource.Error("Something went wrong. Try again later")
+            Resource.Error(UiText.StringResource(R.string.something_wrong))
         }
     }
 

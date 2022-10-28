@@ -1,4 +1,4 @@
-package com.asma.tasky.ui.theme
+package com.asma.tasky.core.presentation.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
