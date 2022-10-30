@@ -1,5 +1,6 @@
 package com.asma.tasky.core.util
 
+import android.content.Context
 import androidx.annotation.StringRes
 import com.asma.tasky.R
 
@@ -9,7 +10,14 @@ sealed class UiText {
 
     companion object {
         fun unknownError(): UiText {
-            return UiText.StringResource(R.string.unknown_error)
+            return StringResource(R.string.unknown_error)
         }
+    }
+}
+
+fun UiText.asString(context: Context): String {
+    return when(this) {
+        is UiText.DynamicString -> this.value
+        is UiText.StringResource -> context.getString(this.id)
     }
 }

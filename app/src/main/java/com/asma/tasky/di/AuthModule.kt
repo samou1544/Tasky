@@ -1,8 +1,9 @@
 package com.asma.tasky.di
 
-import com.asma.tasky.authentication.data.remote.AuthenticationApi
-import com.asma.tasky.authentication.data.repository.AuthenticationRepositoryImpl
-import com.asma.tasky.authentication.domain.repository.AuthenticationRepository
+import android.content.SharedPreferences
+import com.asma.tasky.feature_authentication.data.remote.AuthenticationApi
+import com.asma.tasky.feature_authentication.data.repository.AuthenticationRepositoryImpl
+import com.asma.tasky.feature_authentication.domain.repository.AuthenticationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +30,10 @@ object AuthModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(api: AuthenticationApi): AuthenticationRepository {
-        return AuthenticationRepositoryImpl(api)
+    fun provideAuthRepository(
+        api: AuthenticationApi,
+        sharedPreferences: SharedPreferences
+    ): AuthenticationRepository {
+        return AuthenticationRepositoryImpl(api, sharedPreferences)
     }
 }

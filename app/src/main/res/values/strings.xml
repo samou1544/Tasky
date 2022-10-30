@@ -19,5 +19,9 @@
     <string name="error_invalid_email">Invalid Email</string>
     <string name="error_password_short">The password must be at least 9 characters </string>
     <string name="error_invalid_password">Invalid Password, the password must contain lowercase and uppercase letters as well as at least one digit</string>
+    <string name="successfully_registered">Your account has been successfully register, you can login now</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="get_started">GET STARTED</string>
+    <string name="create_account">Create your account</string>
 
 </resources>

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -27,6 +28,8 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
@@ -67,7 +70,8 @@ class MainActivity : ComponentActivity() {
                         val isLoggedIn by viewModel.isLoggedIn.collectAsState()
                         Navigation(
                             navController,
-                            startDestination = if (isLoggedIn) Screen.AgendaScreen.route else Screen.LoginScreen.route
+                            startDestination = if (isLoggedIn) Screen.AgendaScreen.route else Screen.LoginScreen.route,
+                            scaffoldState
                         )
                     }
                 }
