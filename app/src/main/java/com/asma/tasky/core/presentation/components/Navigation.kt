@@ -12,6 +12,9 @@ import com.asma.tasky.feature_management.agenda.AgendaScreen
 import com.asma.tasky.feature_authentication.presentation.login.LoginScreen
 import com.asma.tasky.feature_authentication.presentation.register.RegisterScreen
 import com.asma.tasky.core.util.Screen
+import com.asma.tasky.feature_management.event.EventScreen
+import com.asma.tasky.feature_management.reminder.ReminderScreen
+import com.asma.tasky.feature_management.task.TaskScreen
 
 @ExperimentalComposeUiApi
 @Composable
@@ -32,7 +35,7 @@ fun Navigation(
                 onLogin = {
                     navController.popBackStack()
                     navController.navigate(route = Screen.AgendaScreen.route)
-                          },
+                },
                 scaffoldState = scaffoldState
             )
         }
@@ -43,6 +46,16 @@ fun Navigation(
         }
         composable(Screen.AgendaScreen.route) {
             AgendaScreen()
+        }
+
+        composable(Screen.TaskScreen.route) {
+            TaskScreen()
+        }
+        composable(Screen.EventScreen.route) {
+            EventScreen()
+        }
+        composable(Screen.ReminderScreen.route) {
+            ReminderScreen()
         }
     }
 }
