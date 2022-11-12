@@ -11,12 +11,11 @@ import androidx.compose.ui.unit.sp
 import com.asma.tasky.core.presentation.ui.theme.SpaceExtraLarge
 
 @Composable
-fun DeleteText(text:String) {
+fun DeleteText(text: String) {
     Text(
         modifier = Modifier
             .padding(vertical = SpaceExtraLarge)
             .clickable {
-
             },
         text = text,
         color = Color.LightGray,

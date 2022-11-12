@@ -10,8 +10,8 @@ import com.asma.tasky.feature_authentication.data.remote.request.LoginRequest
 import com.asma.tasky.feature_authentication.data.remote.request.RegistrationRequest
 import com.asma.tasky.feature_authentication.domain.repository.AuthenticationRepository
 import com.asma.tasky.feature_authentication.domain.util.AuthResult
-import retrofit2.HttpException
 import java.io.IOException
+import retrofit2.HttpException
 
 class AuthenticationRepositoryImpl(
     private val api: AuthenticationApi,
@@ -25,9 +25,8 @@ class AuthenticationRepositoryImpl(
             val result = api.register(request = registrationRequest)
             if (result.isSuccessful) Resource.Success(Unit)
             else Resource.Error(UiText.DynamicString(result.message()))
-
         } catch (e: IOException) {
-            Resource.Error(UiText.StringResource(R.string.netword_error))
+            Resource.Error(UiText.StringResource(R.string.network_error))
         } catch (e: HttpException) {
             Resource.Error(UiText.StringResource(R.string.something_wrong))
         }
@@ -47,15 +46,13 @@ class AuthenticationRepositoryImpl(
                         .apply()
                 }
                 Resource.Success(Unit)
-            } else
-                if (result.errorBody() != null)
-                    result.errorBody()!!.let {
-                        Resource.Error(UiText.DynamicString(it.string()))
-                    }
-                else Resource.Error(UiText.StringResource(R.string.unknown_error))
-
+            } else if (result.errorBody() != null)
+                result.errorBody()!!.let {
+                    Resource.Error(UiText.DynamicString(it.string()))
+                }
+            else Resource.Error(UiText.StringResource(R.string.unknown_error))
         } catch (e: IOException) {
-            Resource.Error(UiText.StringResource(R.string.netword_error))
+            Resource.Error(UiText.StringResource(R.string.network_error))
         } catch (e: HttpException) {
             Resource.Error(UiText.StringResource(R.string.something_wrong))
         }
@@ -79,10 +76,9 @@ class AuthenticationRepositoryImpl(
             api.logout()
             Resource.Success(Unit)
         } catch (e: IOException) {
-            Resource.Error(UiText.StringResource(R.string.netword_error))
+            Resource.Error(UiText.StringResource(R.string.network_error))
         } catch (e: HttpException) {
             Resource.Error(UiText.StringResource(R.string.something_wrong))
         }
     }
-
 }

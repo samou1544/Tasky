@@ -3,15 +3,15 @@ package com.asma.tasky.di
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import com.asma.tasky.feature_authentication.data.remote.util.ApiKeyInterceptor
 import com.asma.tasky.core.util.Constants
+import com.asma.tasky.feature_authentication.data.remote.util.ApiKeyInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)

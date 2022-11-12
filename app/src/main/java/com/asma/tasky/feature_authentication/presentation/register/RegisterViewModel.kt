@@ -5,18 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asma.tasky.R
-import com.asma.tasky.feature_authentication.domain.util.AuthError
-import com.asma.tasky.feature_authentication.domain.util.Validation
-import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.domain.states.TextFieldState
 import com.asma.tasky.core.presentation.util.UiEvent
+import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_authentication.domain.repository.AuthenticationRepository
+import com.asma.tasky.feature_authentication.domain.util.AuthError
+import com.asma.tasky.feature_authentication.domain.util.Validation
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
@@ -64,7 +64,6 @@ class RegisterViewModel @Inject constructor(
                     text = password
                 )
                 validatePassword(password)
-
             }
             is RegisterEvent.TogglePasswordVisibility -> {
                 _registerState.value = _registerState.value.copy(
@@ -106,10 +105,8 @@ class RegisterViewModel @Inject constructor(
                                 )
                             )
                             _registerState.value = _registerState.value.copy(isLoading = false)
-
                         }
                     }
-
                 }
             }
         }
@@ -142,5 +139,4 @@ class RegisterViewModel @Inject constructor(
             _registerState.value.copy(isPasswordValid = passwordError == null)
         return passwordError
     }
-
 }

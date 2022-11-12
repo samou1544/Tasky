@@ -3,7 +3,6 @@ package com.asma.tasky.feature_authentication.domain.util
 import android.util.Patterns
 import com.asma.tasky.core.util.Constants
 
-
 object Validation {
 
     fun validateName(name: String): AuthError? {

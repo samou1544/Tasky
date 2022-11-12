@@ -25,7 +25,6 @@ import com.asma.tasky.R
 import com.asma.tasky.core.presentation.ui.theme.Green
 import com.asma.tasky.core.presentation.ui.theme.LightGray
 
-
 @Composable
 fun FormTextField(
     modifier: Modifier = Modifier,
@@ -50,7 +49,6 @@ fun FormTextField(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-
             .then(modifier)
     ) {
         TextField(
@@ -107,19 +105,20 @@ fun FormTextField(
                     }
                 }
                 icon
-            } else if(isCheckMarkDisplayed){
+            } else if (isCheckMarkDisplayed) {
                 val icon: @Composable () -> Unit = {
                     IconButton(
                         onClick = {}
                     ) {
-                        Icon(imageVector = Icons.Filled.Check,
+                        Icon(
+                            imageVector = Icons.Filled.Check,
                             tint = Green,
                             contentDescription = "check mark"
                         )
                     }
                 }
                 icon
-            }else null,
+            } else null,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
@@ -145,5 +144,3 @@ fun FormTextField(
 fun Preview() {
     FormTextField(hint = "email", onValueChange = {}, isCheckMarkDisplayed = true)
 }
-
-
