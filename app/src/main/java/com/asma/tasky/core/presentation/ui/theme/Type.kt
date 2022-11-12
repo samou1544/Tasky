@@ -1,11 +1,9 @@
 package com.asma.tasky.core.presentation.ui.theme
 
 import androidx.compose.material.Typography
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.asma.tasky.R
 
 private val Inter = FontFamily(
@@ -18,7 +16,7 @@ private val Inter = FontFamily(
     Font(R.font.inter_medium, weight = FontWeight.Medium),
     Font(R.font.inter_semibold, weight = FontWeight.SemiBold),
     Font(R.font.inter_thin, weight = FontWeight.Thin),
-    )
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(

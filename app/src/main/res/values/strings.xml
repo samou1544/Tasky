@@ -11,7 +11,7 @@
     <string name="token">10895044a3d34ddba7fa77f292d145fe</string>
     <string name="add_item">add agenda item</string>
     <string name="unknown_error">Unknown Error</string>
-    <string name="netword_error">Network error. Check your internet connection</string>
+    <string name="network_error">Network error. Check your internet connection</string>
     <string name="something_wrong">Something went wrong. Try again later</string>
     <string name="error_field_empty">This field is required</string>
     <string name="error_input_short">The name must be 2 characters at least </string>
@@ -23,5 +23,22 @@
     <string name="welcome_back">Welcome Back!</string>
     <string name="get_started">GET STARTED</string>
     <string name="create_account">Create your account</string>
+    <string name="save">Save</string>
+    <string name="close">Close</string>
+    <string name="edit">Edit</string>
+    <string name="task">Task</string>
+    <string name="at">At</string>
+    <string name="edit_title">Edit title</string>
+    <string name="edit_description">Edit Description</string>
+    <string name="back_button_content_description">back button</string>
+    <string name="new_task">New Task</string>
+    <string name="task_description">Task Description</string>
+    <string name="reminder_content_description">reminder icon</string>
+    <string name="edit_icon_content_description">edit icon content description</string>
+    <string name="ten_minutes_before">10 minutes before</string>
+    <string name="thirty_minutes_before">30 minutes before</string>
+    <string name="one_hour_before">1 hour before</string>
+    <string name="six_hours_before">6 hours before</string>
+    <string name="one_day_before">1 day before</string>
 
 </resources>

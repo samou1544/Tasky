@@ -12,5 +12,4 @@ interface AuthenticationRepository {
     suspend fun authenticate(): AuthResult
 
     suspend fun logout(): Resource<Unit>
-
 }
