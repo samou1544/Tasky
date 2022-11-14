@@ -1,7 +1,5 @@
 package com.asma.tasky.feature_management.presentation.task
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,50 +15,35 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
 import com.asma.tasky.core.presentation.ui.theme.Green
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
 import com.asma.tasky.core.presentation.ui.theme.SpaceSmall
-import com.asma.tasky.feature_management.domain.Task
-import com.asma.tasky.feature_management.domain.util.Reminder
 import com.asma.tasky.feature_management.presentation.components.*
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskScreen(
-    task: Task,
-    editable: Boolean = false,
+    title: String? = null,
+    description: String? = null,
     onEditTitle: (String?) -> (Unit),
-    onEditDescription: (String?) -> (Unit)
+    onEditDescription: (String?) -> (Unit),
+    viewModel: TaskViewModel = hiltViewModel()
 ) {
     val timeDialogState = rememberMaterialDialogState()
     val dateDialogState = rememberMaterialDialogState()
 
-    // todo put the remembered values in the viewModel
-    val title by remember {
-        mutableStateOf(task.title)
-    }
-    val description by remember {
-        mutableStateOf(task.description)
-    }
-    var time by remember {
-        mutableStateOf(LocalDateTime.ofEpochSecond(task.startDate!! / 1000, 0, ZoneOffset.UTC))
-    }
-    var reminder by remember {
-        mutableStateOf<Reminder>(Reminder.OneHourBefore)
-    }
-    var showReminderDropDown by remember {
-        mutableStateOf(false)
-    }
-    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+    val taskState by viewModel.taskState.collectAsState()
+    val taskTime by viewModel.taskTime.collectAsState()
+    val reminder by viewModel.taskReminder.collectAsState()
+    val editable by viewModel.editModeState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -82,9 +65,9 @@ fun TaskScreen(
                     tint = Color.White
                 )
             }
+            val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
             Text(
-                text = LocalDateTime.ofEpochSecond(task.startDate!! / 1000, 0, ZoneOffset.UTC)
-                    .format(formatter),
+                text = taskTime.format(formatter),
                 color = Color.White,
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold
@@ -106,7 +89,6 @@ fun TaskScreen(
                     )
                 }
         }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -142,7 +124,11 @@ fun TaskScreen(
                 }
 
                 // title
-                Title(title = title, editable = editable, onClick = onEditTitle)
+                Title(
+                    title = title ?: stringResource(id = R.string.new_task),
+                    editable = editable,
+                    onClick = onEditTitle
+                )
                 Divider(
                     modifier = Modifier.padding(
                         horizontal = SpaceMedium
@@ -152,9 +138,9 @@ fun TaskScreen(
 
                 // description
                 Description(
-                    description = description,
+                    description = description ?: stringResource(id = R.string.task_description),
                     editable = editable,
-                    onClick = { onEditDescription(task.description) }
+                    onClick = { onEditDescription(description) }
                 )
                 Divider(
                     modifier = Modifier.padding(
@@ -167,7 +153,7 @@ fun TaskScreen(
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 TimeSelector(
                     label = stringResource(R.string.at),
-                    startDateTime = time,
+                    startDateTime = taskTime,
                     editable = editable,
                     onEditDate = {
                         dateDialogState.show()
@@ -189,15 +175,15 @@ fun TaskScreen(
                         reminder = reminder,
                         editable = editable,
                         onClick = {
-                            showReminderDropDown = true
+                            viewModel.onEvent(TaskEvent.ToggleReminderDropDown)
                         })
                     ReminderDropDown(
-                        expanded = showReminderDropDown,
+                        expanded = taskState.showReminderDropDown,
                         onDismiss = {
-                            showReminderDropDown = false
+                            viewModel.onEvent(TaskEvent.ToggleReminderDropDown)
                         },
                         onSelected = {
-                            reminder = it
+                            viewModel.onEvent(TaskEvent.ReminderSelected(it))
                         })
                 }
 
@@ -220,7 +206,7 @@ fun TaskScreen(
                 }
             ) {
                 timepicker {
-                    time = time.with(it)
+                    viewModel.onEvent(TaskEvent.TimeSelected(it))
                 }
             }
 
@@ -232,7 +218,7 @@ fun TaskScreen(
                 }
             ) {
                 datepicker { date ->
-                    time = time.with(date)
+                    viewModel.onEvent(TaskEvent.DateSelected(date))
                 }
             }
         }

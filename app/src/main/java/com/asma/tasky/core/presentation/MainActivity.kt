@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
                                                 onClick = {
                                                     viewModel.setShowMenu(false)
                                                     when (index) {
-                                                        0 -> navController.navigate(Screen.EventScreen.route)
+                                                        0 -> navController.navigate(Screen.EventScreen.route + "?editable=true")
                                                         1 -> navController.navigate(Screen.TaskScreen.route)
                                                         2 -> navController.navigate(Screen.ReminderScreen.route)
                                                     }
