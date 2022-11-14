@@ -15,8 +15,8 @@ import com.asma.tasky.core.util.Screen
 import com.asma.tasky.feature_authentication.presentation.login.LoginScreen
 import com.asma.tasky.feature_authentication.presentation.register.RegisterScreen
 import com.asma.tasky.feature_management.presentation.agenda.AgendaScreen
-import com.asma.tasky.feature_management.presentation.edit.EditDescriptionScreen
-import com.asma.tasky.feature_management.presentation.edit.EditTitleScreen
+import com.asma.tasky.feature_management.presentation.edit.EditFieldScreen
+import com.asma.tasky.feature_management.presentation.edit.EditableField
 import com.asma.tasky.feature_management.presentation.event.EventScreen
 import com.asma.tasky.feature_management.presentation.reminder.ReminderScreen
 import com.asma.tasky.feature_management.presentation.task.TaskScreen
@@ -76,9 +76,9 @@ fun Navigation(
                 title = title,
                 description = description,
                 onEditTitle = {
-                    navController.navigate(Screen.EditTitleScreen.route + "/$it")
+                    navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Title.key}/$it")
                 }, onEditDescription = {
-                    navController.navigate(Screen.EditDescriptionScreen.route + "/$it")
+                    navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
                 })
         }
         composable(Screen.EventScreen.route) {
@@ -87,20 +87,12 @@ fun Navigation(
         composable(Screen.ReminderScreen.route) {
             ReminderScreen()
         }
-        composable(Screen.EditTitleScreen.route + "/{text}") {
-            EditTitleScreen(onClickSave = { title ->
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(Constants.KEY_TITLE, title)
-                navController.popBackStack()
-            }, onBack = { navController.popBackStack() })
-        }
+        composable(Screen.EditFieldScreen.route + "/{title}/{text}") {
 
-        composable(Screen.EditDescriptionScreen.route + "/{text}") {
-            EditDescriptionScreen(onClickSave = { description ->
+            EditFieldScreen(onClickSave = { key, text ->
                 navController.previousBackStackEntry
                     ?.savedStateHandle
-                    ?.set(Constants.KEY_DESCRIPTION, description)
+                    ?.set(key, text)
                 navController.popBackStack()
             }, onBack = { navController.popBackStack() })
         }

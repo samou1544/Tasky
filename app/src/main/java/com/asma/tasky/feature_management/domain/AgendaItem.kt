@@ -9,9 +9,9 @@ sealed class AgendaItem {
         val title: String = "",
         val description: String = "",
         val startDate: Long? = null,
-        val endDate: Long? = null,
+        val reminder: Long? = null,
         val isDone: Boolean = false,
-        @PrimaryKey val id: String = ""
+        @PrimaryKey val id: String? = null
     ) : AgendaItem()
 
     @Entity
@@ -21,7 +21,7 @@ sealed class AgendaItem {
         val startDate: Long? = null,
         val endDate: Long? = null,
         val isDone: Boolean = false,
-        @PrimaryKey val id: String = ""
+        @PrimaryKey val id: String? = null
     ) : AgendaItem()
 
     @Entity
@@ -29,9 +29,7 @@ sealed class AgendaItem {
         val title: String = "",
         val description: String = "",
         val startDate: Long? = null,
-        val endDate: Long? = null,
-        val isDone: Boolean = false,
-        @PrimaryKey val id: String = ""
+        @PrimaryKey val id: String? = null
     ) : AgendaItem()
 
 }

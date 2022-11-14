@@ -1,13 +1,17 @@
 package com.asma.tasky.feature_management.presentation.task
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,11 +43,17 @@ fun TaskScreen(
     val timeDialogState = rememberMaterialDialogState()
     val dateDialogState = rememberMaterialDialogState()
 
+    val taskTitle by viewModel.taskTitle.collectAsState()
+    val taskDescription by viewModel.taskDescription.collectAsState()
     val taskState by viewModel.taskState.collectAsState()
     val taskTime by viewModel.taskTime.collectAsState()
     val reminder by viewModel.taskReminder.collectAsState()
     val editable by viewModel.editModeState.collectAsState()
 
+    LaunchedEffect(key1 = true) {
+        viewModel.onEvent(TaskEvent.TitleEntered(title))
+        viewModel.onEvent(TaskEvent.DescriptionEntered(description))
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -74,7 +84,11 @@ fun TaskScreen(
             )
             if (editable) {
                 Text(
-                    modifier = Modifier.padding(end = SpaceLarge),
+                    modifier = Modifier
+                        .padding(end = SpaceLarge)
+                        .clickable {
+                            viewModel.onEvent(TaskEvent.Save)
+                        },
                     text = stringResource(R.string.save),
                     color = Color.White,
                     style = MaterialTheme.typography.body1,
@@ -125,7 +139,7 @@ fun TaskScreen(
 
                 // title
                 Title(
-                    title = title ?: stringResource(id = R.string.new_task),
+                    title = taskTitle.ifEmpty { stringResource(id = R.string.new_task) },
                     editable = editable,
                     onClick = onEditTitle
                 )
@@ -138,9 +152,9 @@ fun TaskScreen(
 
                 // description
                 Description(
-                    description = description ?: stringResource(id = R.string.task_description),
+                    description = taskDescription.ifEmpty { stringResource(id = R.string.task_description) },
                     editable = editable,
-                    onClick = { onEditDescription(description) }
+                    onClick = onEditDescription
                 )
                 Divider(
                     modifier = Modifier.padding(
@@ -194,7 +208,9 @@ fun TaskScreen(
 
                 // Delete
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-                    DeleteText(text = "DELETE TASK")
+                    DeleteText(
+                        text = stringResource(R.string.delete_task),
+                        onDelete = { viewModel.onEvent(TaskEvent.Delete) })
                 }
             }
 

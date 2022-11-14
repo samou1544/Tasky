@@ -5,8 +5,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 sealed class TaskEvent {
-    data class TitleEntered(val title: String) : TaskEvent()
-    data class DescriptionEntered(val description: String) : TaskEvent()
+    data class TitleEntered(val title: String?) : TaskEvent()
+    data class DescriptionEntered(val description: String?) : TaskEvent()
     data class TimeSelected(val time: LocalTime) : TaskEvent()
     data class DateSelected(val date: LocalDate) : TaskEvent()
     data class ReminderSelected(val reminder: Reminder) : TaskEvent()

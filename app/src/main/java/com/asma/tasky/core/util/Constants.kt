@@ -15,6 +15,7 @@ object Constants {
     const val SHARED_PREF_NAME = "shared_pref"
 
     const val PARAM_TEXT = "text"
+    const val PARAM_TITLE = "title"
     const val KEY_TITLE = "title"
     const val KEY_DESCRIPTION = "description"
 }

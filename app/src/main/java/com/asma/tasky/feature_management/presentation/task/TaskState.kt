@@ -6,5 +6,5 @@ data class TaskState(
     val isLoading: Boolean = false,
     val task: AgendaItem.Task = AgendaItem.Task(),
     val showReminderDropDown: Boolean = false,
-    val error: String? = null
+    val showDeleteTask:Boolean = false
 )

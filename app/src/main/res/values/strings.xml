@@ -28,8 +28,8 @@
     <string name="edit">Edit</string>
     <string name="task">Task</string>
     <string name="at">At</string>
-    <string name="edit_title">Edit title</string>
-    <string name="edit_description">Edit Description</string>
+    <string name="edit_title">EDIT TITLE</string>
+    <string name="edit_description">EDIT DESCRIPTION</string>
     <string name="back_button_content_description">back button</string>
     <string name="new_task">New Task</string>
     <string name="task_description">Task Description</string>
@@ -41,5 +41,6 @@
     <string name="six_hours_before">6 hours before</string>
     <string name="one_day_before">1 day before</string>
     <string name="invalid_task">Invalid task</string>
+    <string name="delete_task">DELETE TASK</string>
 
 </resources>

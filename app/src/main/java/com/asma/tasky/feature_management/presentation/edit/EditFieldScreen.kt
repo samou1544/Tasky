@@ -20,20 +20,29 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
+import com.asma.tasky.core.util.Constants
 import com.asma.tasky.feature_management.presentation.edit.components.CustomTopBar
 
 @Composable
-fun EditTitleScreen(
+fun EditFieldScreen(
     viewModel: EditViewModel = hiltViewModel(),
-    onClickSave: (String) -> Unit,
+    onClickSave: (String, String) -> Unit,
     onBack: () -> (Unit)
 ) {
     val text by viewModel.text.collectAsState()
+    val key by viewModel.key.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CustomTopBar(title = stringResource(id = R.string.edit_title), onClickSave = {
-            onClickSave(text.text)
-        }, onClickBack = onBack)
+        val title = when (key) {
+            Constants.KEY_TITLE -> stringResource(id = R.string.edit_title)
+            Constants.KEY_DESCRIPTION -> stringResource(id = R.string.edit_description)
+            else -> key
+        }
+        CustomTopBar(title = title,
+            onClickSave = {
+                onClickSave(key, text.text)
+            }, onClickBack = onBack
+        )
 
         BasicTextField(
             modifier = Modifier
@@ -41,7 +50,7 @@ fun EditTitleScreen(
                 .padding(vertical = SpaceLarge, horizontal = SpaceMedium),
             value = text.text,
             textStyle = TextStyle(
-                fontSize = 26.sp,
+                fontSize = if (key == Constants.KEY_TITLE) 26.sp else 16.sp,
                 fontWeight = FontWeight.Normal
             ),
             keyboardOptions = KeyboardOptions(
