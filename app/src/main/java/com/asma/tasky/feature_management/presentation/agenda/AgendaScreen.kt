@@ -208,7 +208,7 @@ fun AgendaListItem(item: AgendaItem, onClick:(AgendaItem)->(Unit)) {
                 Icon(
                     modifier = Modifier.padding(top = 2.dp),
                     //todo check if it's done
-                    imageVector = if (item is AgendaItem.Task) Icons.Outlined.CheckCircle else Icons.Outlined.Circle,
+                    imageVector = if (item.isDone) Icons.Outlined.CheckCircle else Icons.Outlined.Circle,
                     contentDescription = "",
                     tint = tintColor
                 )
@@ -218,14 +218,14 @@ fun AgendaListItem(item: AgendaItem, onClick:(AgendaItem)->(Unit)) {
                         text = item.title,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = textColor
+                        color = textColor,
+                        textDecoration = if(item.isDone) TextDecoration.LineThrough else TextDecoration.None,
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
                     Text(
                         text = item.description,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Light,
-                        textDecoration = TextDecoration.LineThrough,
                         color = textColor
                     )
                 }

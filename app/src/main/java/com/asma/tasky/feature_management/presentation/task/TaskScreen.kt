@@ -28,13 +28,13 @@ import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
 import com.asma.tasky.core.presentation.ui.theme.SpaceSmall
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.asString
+import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.presentation.components.*
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.flow.collectLatest
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun TaskScreen(
@@ -58,7 +58,7 @@ fun TaskScreen(
         title?.let {
             viewModel.onEvent(TaskEvent.TitleEntered(it))
         }
-        description?.let{
+        description?.let {
             viewModel.onEvent(TaskEvent.DescriptionEntered(it))
         }
         viewModel.eventFlow.collectLatest { event ->
@@ -97,9 +97,8 @@ fun TaskScreen(
                     tint = Color.White
                 )
             }
-            val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
             Text(
-                text = taskTime.format(formatter),
+                text = DateUtil.formatDate(taskTime, "dd MMMM yyyy"),
                 color = Color.White,
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold
@@ -183,7 +182,7 @@ fun TaskScreen(
 
                 // description
                 Description(
-                    description =  taskState.task.description.ifEmpty { stringResource(id = R.string.task_description) },
+                    description = taskState.task.description.ifEmpty { stringResource(id = R.string.task_description) },
                     editable = taskState.isEditable,
                     onClick = onEditDescription
                 )
@@ -248,11 +247,11 @@ fun TaskScreen(
             MaterialDialog(
                 dialogState = timeDialogState,
                 buttons = {
-                    positiveButton("Ok")
-                    negativeButton("Cancel")
+                    positiveButton(stringResource(R.string.dialog_ok))
+                    negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                timepicker {
+                timepicker(initialTime = taskTime.toLocalTime()) {
                     viewModel.onEvent(TaskEvent.TimeSelected(it))
                 }
             }
@@ -260,11 +259,11 @@ fun TaskScreen(
             MaterialDialog(
                 dialogState = dateDialogState,
                 buttons = {
-                    positiveButton("Ok")
-                    negativeButton("Cancel")
+                    positiveButton(stringResource(R.string.dialog_ok))
+                    negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                datepicker { date ->
+                datepicker(initialDate = taskTime.toLocalDate()) { date ->
                     viewModel.onEvent(TaskEvent.DateSelected(date))
                 }
             }

@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -14,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -58,14 +60,16 @@ class MainActivity : ComponentActivity() {
                             if (shouldShowFAB(navBackStackEntry)) {
                                 Box(modifier = Modifier) {
                                     FloatingActionButton(
-                                        backgroundColor = MaterialTheme.colors.primary,
+                                        backgroundColor = Color.Black,
+                                        shape = RoundedCornerShape(16.dp),
                                         onClick = {
                                             viewModel.setShowMenu(true)
                                         }
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Add,
-                                            contentDescription = stringResource(id = R.string.add_item)
+                                            contentDescription = stringResource(id = R.string.add_item),
+                                            tint = Color.White
                                         )
                                     }
                                     DropdownMenu(
@@ -81,8 +85,8 @@ class MainActivity : ComponentActivity() {
                                                     viewModel.setShowMenu(false)
                                                     when (index) {
                                                         0 -> navController.navigate(Screen.EventScreen.route + "?editable=true")
-                                                        1 -> navController.navigate(Screen.TaskScreen.route)
-                                                        2 -> navController.navigate(Screen.ReminderScreen.route)
+                                                        1 -> navController.navigate(Screen.TaskScreen.route + "?editable=true")
+                                                        2 -> navController.navigate(Screen.ReminderScreen.route + "?editable=true")
                                                     }
                                                 }
                                             ) {

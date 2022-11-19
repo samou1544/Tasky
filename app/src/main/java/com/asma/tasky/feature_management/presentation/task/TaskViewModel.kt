@@ -83,7 +83,7 @@ class TaskViewModel @Inject constructor(
             _taskTime.update { LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC) }
         }
         _taskReminder.update {
-            computeReminder(task.startDate!!, task.reminder ?: task.startDate)
+            computeReminder(startTime = task.startDate!!, reminderTime = task.reminder ?: task.startDate)
         }
         //todo check if the task is already done
     }
@@ -191,11 +191,21 @@ class TaskViewModel @Inject constructor(
 
     private fun computeReminder(reminderTime: Long, startTime: Long): Reminder {
         return when (startTime - reminderTime) {
-            Reminder.OneHourBefore.seconds.toLong() -> Reminder.OneHourBefore
-            Reminder.OneDayBefore.seconds.toLong() -> Reminder.OneDayBefore
-            Reminder.ThirtyMinutesBefore.seconds.toLong() -> Reminder.ThirtyMinutesBefore
-            Reminder.TenMinutesBefore.seconds.toLong() -> Reminder.TenMinutesBefore
-            Reminder.SixHoursBefore.seconds.toLong() -> Reminder.SixHoursBefore
+            Reminder.OneHourBefore.seconds -> {
+                Reminder.OneHourBefore
+            }
+            Reminder.OneDayBefore.seconds -> {
+                Reminder.OneDayBefore
+            }
+            Reminder.ThirtyMinutesBefore.seconds -> {
+                Reminder.ThirtyMinutesBefore
+            }
+            Reminder.TenMinutesBefore.seconds -> {
+                Reminder.TenMinutesBefore
+            }
+            Reminder.SixHoursBefore.seconds -> {
+                Reminder.SixHoursBefore
+            }
             else -> {
                 Reminder.OneHourBefore
             }

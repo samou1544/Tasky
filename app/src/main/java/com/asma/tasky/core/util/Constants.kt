@@ -16,6 +16,7 @@ object Constants {
 
     const val PARAM_TEXT = "text"
     const val PARAM_TITLE = "title"
+
     const val KEY_TITLE = "title"
     const val KEY_DESCRIPTION = "description"
 }

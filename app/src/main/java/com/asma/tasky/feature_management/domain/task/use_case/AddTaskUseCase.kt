@@ -17,7 +17,9 @@ class AddTaskUseCase @Inject constructor(
         if (task.title.isBlank()) {
             emit(Resource.Error(message = UiText.StringResource(R.string.invalid_task)))
         }
-        repository.addTask(task)
-        emit(Resource.Success(Unit))
+        else {
+            repository.addTask(task)
+            emit(Resource.Success(Unit))
+        }
     }
 }
