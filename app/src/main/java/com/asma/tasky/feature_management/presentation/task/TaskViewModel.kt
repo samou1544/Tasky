@@ -9,6 +9,8 @@ import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.task.use_case.AddTaskUseCase
+import com.asma.tasky.feature_management.domain.task.use_case.DeleteTaskUseCase
+import com.asma.tasky.feature_management.domain.task.use_case.GetTaskUseCase
 import com.asma.tasky.feature_management.domain.util.Reminder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -19,20 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    getTaskUseCase: GetTaskUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _taskState = MutableStateFlow(TaskState())
     val taskState = _taskState.asStateFlow()
-
-    private val _taskTitle = MutableStateFlow("")
-    val taskTitle = _taskTitle.asStateFlow()
-
-    private val _taskDescription = MutableStateFlow("")
-    val taskDescription = _taskDescription.asStateFlow()
-
-    private val _editModeState = MutableStateFlow(false)
-    val editModeState = _editModeState.asStateFlow()
 
     private val _taskTime = MutableStateFlow(LocalDateTime.now())
     val taskTime = _taskTime.asStateFlow()
@@ -44,21 +39,32 @@ class TaskViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        savedStateHandle.get<Boolean>(Constants.PARAM_EDITABLE)?.let {
-            _editModeState.update { it }
+        savedStateHandle.get<Boolean>(Constants.PARAM_EDITABLE)?.let {editable->
+            _taskState.update {
+                it.copy(isEditable = editable)
+            }
         }
 
         val taskId = savedStateHandle.get<String>(Constants.PARAM_ID)
 
         if (!taskId.isNullOrEmpty()) {
-            //todo load task from database
-            _taskState.update {
-                it.copy(showDeleteTask = true)
-            }
+            //todo taskId is an Int
+            getTaskUseCase(taskId.toInt()).onEach { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        result.data?.let { task ->
+                            updateState(task)
+                        }
+                    }
+                    is Resource.Error -> {}
+                }
+            }.launchIn(viewModelScope)
+
         } else {
             //this is a new task, turn on editable mode
-            _editModeState.update { true }
-
+            _taskState.update {
+                it.copy(isEditable = true)
+            }
             _taskTime.update {
                 LocalDateTime.ofEpochSecond(System.currentTimeMillis() / 1000, 0, ZoneOffset.UTC)
             }
@@ -66,13 +72,34 @@ class TaskViewModel @Inject constructor(
         }
     }
 
+    private fun updateState(task: AgendaItem.Task) {
+        _taskState.update {
+            it.copy(task = task)
+        }
+        _taskState.update {
+            it.copy(showDeleteTask = true)
+        }
+        task.startDate?.let { time ->
+            _taskTime.update { LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC) }
+        }
+        _taskReminder.update {
+            computeReminder(task.startDate!!, task.reminder ?: task.startDate)
+        }
+        //todo check if the task is already done
+    }
+
     fun onEvent(event: TaskEvent) {
         when (event) {
             is TaskEvent.TitleEntered -> {
-                _taskTitle.update { event.title ?: "" }
+                _taskState.update {
+                    it.copy(task = it.task.copy(title = event.title))
+                }
+
             }
             is TaskEvent.DescriptionEntered -> {
-                _taskDescription.update { event.description ?: "" }
+                _taskState.update {
+                    it.copy(task = it.task.copy(description = event.description))
+                }
             }
             is TaskEvent.TimeSelected -> {
                 _taskTime.update {
@@ -93,15 +120,19 @@ class TaskViewModel @Inject constructor(
                 _taskState.update {
                     it.copy(isLoading = true)
                 }
-                val task = AgendaItem.Task(
-                    title = _taskTitle.value,
-                    description = taskDescription.value,
-                    startDate = _taskTime.value.toEpochSecond(ZoneOffset.UTC)
+
+                val task = _taskState.value.task.copy(
+                    startDate = _taskTime.value.toEpochSecond(ZoneOffset.UTC),
+                    isDone = false,
+                    reminder = computeReminderSeconds(_taskReminder.value, _taskTime.value),
+                    id = _taskState.value.task.id
                 )
+
                 addTaskUseCase(task).onEach { result ->
                     when (result) {
                         is Resource.Success -> {
                             //todo push data to server
+                            _eventFlow.emit(UiEvent.NavigateUp)
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(
@@ -117,11 +148,56 @@ class TaskViewModel @Inject constructor(
                 }.launchIn(viewModelScope)
 
             }
-            is TaskEvent.Delete -> {}
+            is TaskEvent.Delete -> {
+                deleteTaskUseCase(_taskState.value.task).onEach { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            //todo remove task from server
+                            _eventFlow.emit(UiEvent.NavigateUp)
+                            _taskState.update {
+                                it.copy(isLoading = false)
+                            }
+                        }
+                        is Resource.Error -> {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    result.uiText ?: UiText.unknownError()
+                                )
+                            )
+                            _taskState.update {
+                                it.copy(isLoading = false)
+                            }
+                        }
+                    }
+                }.launchIn(viewModelScope)
+            }
             is TaskEvent.ToggleReminderDropDown -> {
                 _taskState.update {
                     it.copy(showReminderDropDown = it.showReminderDropDown.not())
                 }
+            }
+            is TaskEvent.ToggleEditMode -> {
+                _taskState.update {
+                    it.copy(isEditable = it.isEditable.not())
+                }
+            }
+        }
+    }
+
+
+    private fun computeReminderSeconds(reminder: Reminder, startTime: LocalDateTime): Long {
+        return startTime.toEpochSecond(ZoneOffset.UTC) - reminder.seconds
+    }
+
+    private fun computeReminder(reminderTime: Long, startTime: Long): Reminder {
+        return when (startTime - reminderTime) {
+            Reminder.OneHourBefore.seconds.toLong() -> Reminder.OneHourBefore
+            Reminder.OneDayBefore.seconds.toLong() -> Reminder.OneDayBefore
+            Reminder.ThirtyMinutesBefore.seconds.toLong() -> Reminder.ThirtyMinutesBefore
+            Reminder.TenMinutesBefore.seconds.toLong() -> Reminder.TenMinutesBefore
+            Reminder.SixHoursBefore.seconds.toLong() -> Reminder.SixHoursBefore
+            else -> {
+                Reminder.OneHourBefore
             }
         }
     }

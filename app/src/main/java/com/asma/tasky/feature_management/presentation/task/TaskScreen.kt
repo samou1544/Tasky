@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,11 +26,14 @@ import com.asma.tasky.core.presentation.ui.theme.Green
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
 import com.asma.tasky.core.presentation.ui.theme.SpaceSmall
+import com.asma.tasky.core.presentation.util.UiEvent
+import com.asma.tasky.core.util.asString
 import com.asma.tasky.feature_management.presentation.components.*
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.flow.collectLatest
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -38,21 +42,39 @@ fun TaskScreen(
     description: String? = null,
     onEditTitle: (String?) -> (Unit),
     onEditDescription: (String?) -> (Unit),
+    onNavigateUp: () -> (Unit),
+    scaffoldState: ScaffoldState,
     viewModel: TaskViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val timeDialogState = rememberMaterialDialogState()
     val dateDialogState = rememberMaterialDialogState()
 
-    val taskTitle by viewModel.taskTitle.collectAsState()
-    val taskDescription by viewModel.taskDescription.collectAsState()
     val taskState by viewModel.taskState.collectAsState()
     val taskTime by viewModel.taskTime.collectAsState()
     val reminder by viewModel.taskReminder.collectAsState()
-    val editable by viewModel.editModeState.collectAsState()
 
     LaunchedEffect(key1 = true) {
-        viewModel.onEvent(TaskEvent.TitleEntered(title))
-        viewModel.onEvent(TaskEvent.DescriptionEntered(description))
+        title?.let {
+            viewModel.onEvent(TaskEvent.TitleEntered(it))
+        }
+        description?.let{
+            viewModel.onEvent(TaskEvent.DescriptionEntered(it))
+        }
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        event.uiText.asString(context),
+                        duration = SnackbarDuration.Long
+                    )
+                }
+                is UiEvent.NavigateUp -> {
+                    onNavigateUp()
+                }
+                else -> {}
+            }
+        }
     }
     Column(
         modifier = Modifier
@@ -68,7 +90,7 @@ fun TaskScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = onNavigateUp) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.close),
@@ -82,20 +104,29 @@ fun TaskScreen(
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold
             )
-            if (editable) {
-                Text(
-                    modifier = Modifier
-                        .padding(end = SpaceLarge)
-                        .clickable {
-                            viewModel.onEvent(TaskEvent.Save)
-                        },
-                    text = stringResource(R.string.save),
-                    color = Color.White,
-                    style = MaterialTheme.typography.body1,
-                    fontWeight = FontWeight.Normal
-                )
+            if (taskState.isEditable) {
+                Row {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(end = SpaceLarge)
+                            .clickable {
+                                viewModel.onEvent(TaskEvent.Save)
+                            },
+                        text = stringResource(R.string.save),
+                        color = Color.White,
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = FontWeight.Normal
+                    )
+                    if (taskState.isLoading) {
+                        Spacer(modifier = Modifier.width(SpaceSmall))
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
+                    }
+                }
             } else
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    viewModel.onEvent(TaskEvent.ToggleEditMode)
+                }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(R.string.edit),
@@ -139,8 +170,8 @@ fun TaskScreen(
 
                 // title
                 Title(
-                    title = taskTitle.ifEmpty { stringResource(id = R.string.new_task) },
-                    editable = editable,
+                    title = taskState.task.title.ifEmpty { stringResource(id = R.string.new_task) },
+                    editable = taskState.isEditable,
                     onClick = onEditTitle
                 )
                 Divider(
@@ -152,8 +183,8 @@ fun TaskScreen(
 
                 // description
                 Description(
-                    description = taskDescription.ifEmpty { stringResource(id = R.string.task_description) },
-                    editable = editable,
+                    description =  taskState.task.description.ifEmpty { stringResource(id = R.string.task_description) },
+                    editable = taskState.isEditable,
                     onClick = onEditDescription
                 )
                 Divider(
@@ -168,7 +199,7 @@ fun TaskScreen(
                 TimeSelector(
                     label = stringResource(R.string.at),
                     startDateTime = taskTime,
-                    editable = editable,
+                    editable = taskState.isEditable,
                     onEditDate = {
                         dateDialogState.show()
                     },
@@ -187,7 +218,7 @@ fun TaskScreen(
                 Box {
                     ReminderSelector(
                         reminder = reminder,
-                        editable = editable,
+                        editable = taskState.isEditable,
                         onClick = {
                             viewModel.onEvent(TaskEvent.ToggleReminderDropDown)
                         })

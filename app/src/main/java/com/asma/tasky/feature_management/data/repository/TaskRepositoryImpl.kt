@@ -3,15 +3,12 @@ package com.asma.tasky.feature_management.data.repository
 import com.asma.tasky.feature_management.data.data_source.TaskyDao
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
-import java.time.LocalDate
 
 class TaskRepositoryImpl(private val dao: TaskyDao) : TaskRepository {
 
-    override suspend fun getTasksOfTheDay(day: LocalDate): List<AgendaItem.Task> {
-        return dao.getTasksOfTheDay()
-    }
 
-    override suspend fun getTaskById(id: String): AgendaItem.Task? {
+
+    override suspend fun getTaskById(id: Int): AgendaItem.Task? {
         return dao.getTaskById(id)
     }
 

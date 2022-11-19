@@ -57,9 +57,10 @@ fun ReminderSelector(editable: Boolean, reminder: Reminder, onClick: () -> (Unit
             )
         }
 
-        Icon(
-            imageVector = Icons.Outlined.KeyboardArrowRight,
-            contentDescription = "reminder icon"
-        )
+        if (editable)
+            Icon(
+                imageVector = Icons.Outlined.KeyboardArrowRight,
+                contentDescription = "reminder icon"
+            )
     }
 }
