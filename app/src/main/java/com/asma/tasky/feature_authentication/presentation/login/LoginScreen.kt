@@ -23,14 +23,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
-import com.asma.tasky.feature_authentication.domain.util.AuthError
-import com.asma.tasky.feature_authentication.presentation.components.FormTextField
 import com.asma.tasky.core.presentation.ui.theme.*
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.Screen
 import com.asma.tasky.core.util.asString
+import com.asma.tasky.feature_authentication.domain.util.AuthError
+import com.asma.tasky.feature_authentication.presentation.components.FormTextField
 import kotlinx.coroutines.flow.collectLatest
-
 
 @ExperimentalComposeUiApi
 @Composable

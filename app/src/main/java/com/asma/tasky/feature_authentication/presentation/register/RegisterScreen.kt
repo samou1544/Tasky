@@ -21,14 +21,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
-import com.asma.tasky.feature_authentication.domain.util.AuthError
-import com.asma.tasky.feature_authentication.presentation.components.FormTextField
 import com.asma.tasky.core.presentation.ui.theme.LightGray
 import com.asma.tasky.core.presentation.ui.theme.SpaceExtraLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.asString
+import com.asma.tasky.feature_authentication.domain.util.AuthError
+import com.asma.tasky.feature_authentication.presentation.components.FormTextField
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 

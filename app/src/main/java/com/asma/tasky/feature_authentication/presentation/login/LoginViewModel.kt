@@ -4,16 +4,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.asma.tasky.feature_authentication.domain.use_case.LoginUseCase
-import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.domain.states.TextFieldState
 import com.asma.tasky.core.presentation.util.UiEvent
+import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
+import com.asma.tasky.feature_authentication.domain.use_case.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -81,7 +81,6 @@ class LoginViewModel @Inject constructor(
                         }
                         else -> {}
                     }
-
                 }
             }
         }

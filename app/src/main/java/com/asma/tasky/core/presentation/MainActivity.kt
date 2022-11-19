@@ -1,5 +1,6 @@
 package com.asma.tasky.core.presentation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,9 +49,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val listItems = arrayOf("Event", "Task", "Reminder")
-                    var showMenu by remember {
-                        mutableStateOf(false)
-                    }
+                    val showMenu by viewModel.showMenu.collectAsState()
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val scaffoldState = rememberScaffoldState()
@@ -59,7 +60,7 @@ class MainActivity : ComponentActivity() {
                                     FloatingActionButton(
                                         backgroundColor = MaterialTheme.colors.primary,
                                         onClick = {
-                                            showMenu = true
+                                            viewModel.setShowMenu(true)
                                         }
                                     ) {
                                         Icon(
@@ -71,19 +72,18 @@ class MainActivity : ComponentActivity() {
                                         expanded = showMenu,
                                         offset = DpOffset(x = (0).dp, y = 10.dp),
                                         onDismissRequest = {
-                                            showMenu = false
+                                            viewModel.setShowMenu(false)
                                         }
                                     ) {
                                         listItems.forEachIndexed { index, itemValue ->
                                             DropdownMenuItem(
                                                 onClick = {
-                                                    showMenu = false
+                                                    viewModel.setShowMenu(false)
                                                     when (index) {
                                                         0 -> navController.navigate(Screen.EventScreen.route)
                                                         1 -> navController.navigate(Screen.TaskScreen.route)
                                                         2 -> navController.navigate(Screen.ReminderScreen.route)
                                                     }
-
                                                 }
                                             ) {
                                                 Text(text = itemValue)
@@ -91,22 +91,19 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }
                                 }
-
                             }
                         },
                         scaffoldState = scaffoldState,
                         floatingActionButtonPosition = FabPosition.End
 
-                    ) {
+                    )
+                    {
                         val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-
                         Navigation(
                             navController,
                             startDestination = if (isLoggedIn) Screen.AgendaScreen.route else Screen.LoginScreen.route,
                             scaffoldState
                         )
-
-
                     }
                 }
             }

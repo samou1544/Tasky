@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'org.jlleitschuh.gradle.ktlint' version "11.0.0"
 }
 
 android {
@@ -47,7 +48,15 @@ android {
         }
     }
 }
-
+ktlint {
+    android = true
+    ignoreFailures = false
+    reporters{
+        reporter "plain"
+        reporter "checkstyle"
+        reporter "sarif"
+    }
+}
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
@@ -79,4 +88,7 @@ dependencies {
 
     //splash screen
     implementation 'androidx.core:core-splashscreen:1.0.0'
+
+    //date time picker
+    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
 }
