@@ -3,12 +3,11 @@ package com.asma.tasky.feature_management.data.data_source
 import androidx.room.*
 import com.asma.tasky.feature_management.domain.AgendaItem
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 
 @Dao
 interface TaskyDao {
 
-    //todo select tasks for a given day
+    // todo select tasks for a given day
     @Query("SELECT * FROM task")
     fun getTasksOfTheDay(): Flow<List<AgendaItem.Task>>
 
@@ -20,5 +19,4 @@ interface TaskyDao {
 
     @Delete
     suspend fun deleteTask(task: AgendaItem.Task)
-
 }

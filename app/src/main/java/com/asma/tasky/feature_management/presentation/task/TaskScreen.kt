@@ -220,7 +220,8 @@ fun TaskScreen(
                         editable = taskState.isEditable,
                         onClick = {
                             viewModel.onEvent(TaskEvent.ToggleReminderDropDown)
-                        })
+                        }
+                    )
                     ReminderDropDown(
                         expanded = taskState.showReminderDropDown,
                         onDismiss = {
@@ -228,7 +229,8 @@ fun TaskScreen(
                         },
                         onSelected = {
                             viewModel.onEvent(TaskEvent.ReminderSelected(it))
-                        })
+                        }
+                    )
                 }
 
                 Divider(
@@ -240,7 +242,8 @@ fun TaskScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
                     DeleteText(
                         text = stringResource(R.string.delete_task),
-                        onDelete = { viewModel.onEvent(TaskEvent.Delete) })
+                        onDelete = { viewModel.onEvent(TaskEvent.Delete) }
+                    )
                 }
             }
 

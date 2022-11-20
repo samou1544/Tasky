@@ -8,7 +8,7 @@ import com.asma.tasky.feature_management.domain.AgendaItem
     entities = [AgendaItem.Task::class],
     version = 1
 )
-abstract class TaskyDatabase: RoomDatabase() {
+abstract class TaskyDatabase : RoomDatabase() {
 
     abstract val taskyDao: TaskyDao
 

@@ -100,8 +100,7 @@ class MainActivity : ComponentActivity() {
                         scaffoldState = scaffoldState,
                         floatingActionButtonPosition = FabPosition.End
 
-                    )
-                    {
+                    ) {
                         val isLoggedIn by viewModel.isLoggedIn.collectAsState()
                         Navigation(
                             navController,
