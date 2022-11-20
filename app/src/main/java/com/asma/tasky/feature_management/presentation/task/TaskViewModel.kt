@@ -11,11 +11,11 @@ import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.task.use_case.AddTaskUseCase
 import com.asma.tasky.feature_management.domain.task.use_case.DeleteTaskUseCase
 import com.asma.tasky.feature_management.domain.task.use_case.GetTaskUseCase
+import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.domain.util.Reminder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,7 +39,7 @@ class TaskViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        savedStateHandle.get<Boolean>(Constants.PARAM_EDITABLE)?.let {editable->
+        savedStateHandle.get<Boolean>(Constants.PARAM_EDITABLE)?.let { editable ->
             _taskState.update {
                 it.copy(isEditable = editable)
             }
@@ -65,10 +65,6 @@ class TaskViewModel @Inject constructor(
             _taskState.update {
                 it.copy(isEditable = true)
             }
-            _taskTime.update {
-                LocalDateTime.ofEpochSecond(System.currentTimeMillis() / 1000, 0, ZoneOffset.UTC)
-            }
-
         }
     }
 
@@ -80,10 +76,13 @@ class TaskViewModel @Inject constructor(
             it.copy(showDeleteTask = true)
         }
         task.startDate?.let { time ->
-            _taskTime.update { LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC) }
+            _taskTime.update { DateUtil.secondsToLocalDateTime(time) }
         }
         _taskReminder.update {
-            computeReminder(startTime = task.startDate!!, reminderTime = task.reminder ?: task.startDate)
+            computeReminder(
+                startTime = task.startDate!!,
+                reminderTime = task.reminder ?: task.startDate
+            )
         }
         //todo check if the task is already done
     }
@@ -122,7 +121,7 @@ class TaskViewModel @Inject constructor(
                 }
 
                 val task = _taskState.value.task.copy(
-                    startDate = _taskTime.value.toEpochSecond(ZoneOffset.UTC),
+                    startDate = DateUtil.localDateTimeToSeconds(_taskTime.value),
                     isDone = false,
                     reminder = computeReminderSeconds(_taskReminder.value, _taskTime.value),
                     id = _taskState.value.task.id
@@ -186,7 +185,7 @@ class TaskViewModel @Inject constructor(
 
 
     private fun computeReminderSeconds(reminder: Reminder, startTime: LocalDateTime): Long {
-        return startTime.toEpochSecond(ZoneOffset.UTC) - reminder.seconds
+        return DateUtil.localDateTimeToSeconds(startTime) - reminder.seconds
     }
 
     private fun computeReminder(reminderTime: Long, startTime: Long): Reminder {

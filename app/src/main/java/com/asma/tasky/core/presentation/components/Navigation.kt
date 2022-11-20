@@ -14,7 +14,6 @@ import com.asma.tasky.core.util.Constants
 import com.asma.tasky.core.util.Screen
 import com.asma.tasky.feature_authentication.presentation.login.LoginScreen
 import com.asma.tasky.feature_authentication.presentation.register.RegisterScreen
-import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.presentation.agenda.AgendaScreen
 import com.asma.tasky.feature_management.presentation.edit.EditFieldScreen
 import com.asma.tasky.feature_management.presentation.edit.EditableField
@@ -51,16 +50,7 @@ fun Navigation(
             }, scaffoldState = scaffoldState)
         }
         composable(Screen.AgendaScreen.route) {
-            AgendaScreen{agendaItem->
-                when(agendaItem){
-                    is AgendaItem.Event -> {
-                    }
-                    is AgendaItem.Task -> {
-                        navController.navigate(Screen.TaskScreen.route + "?id=${agendaItem.id}?editable=false")
-                    }
-                    is AgendaItem.Reminder -> {}
-                }
-            }
+            AgendaScreen()
         }
 
         composable(
@@ -91,7 +81,8 @@ fun Navigation(
                     navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
                 }, onNavigateUp = {
                     navController.popBackStack()
-                }, scaffoldState = scaffoldState)
+                }, scaffoldState = scaffoldState
+            )
         }
         composable(Screen.EventScreen.route) {
             EventScreen()

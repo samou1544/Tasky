@@ -6,8 +6,6 @@ import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
 
 class TaskRepositoryImpl(private val dao: TaskyDao) : TaskRepository {
 
-
-
     override suspend fun getTaskById(id: Int): AgendaItem.Task? {
         return dao.getTaskById(id)
     }

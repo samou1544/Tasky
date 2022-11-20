@@ -8,6 +8,7 @@ import java.time.LocalDate
 @Dao
 interface TaskyDao {
 
+    //todo select tasks for a given day
     @Query("SELECT * FROM task")
     fun getTasksOfTheDay(): Flow<List<AgendaItem.Task>>
 

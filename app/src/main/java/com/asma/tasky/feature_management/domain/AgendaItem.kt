@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 sealed class AgendaItem {
-    abstract val isDone: Boolean
     abstract val title: String
     abstract val description: String
     abstract val startDate: Long?
@@ -15,7 +14,7 @@ sealed class AgendaItem {
         override val description: String = "",
         override val startDate: Long? = null,
         val reminder: Long? = null,
-        override val isDone: Boolean = false,
+        val isDone: Boolean = false,
         @PrimaryKey(autoGenerate = true) var id: Int = 0
     ) : AgendaItem()
 
@@ -25,7 +24,7 @@ sealed class AgendaItem {
         override val description: String = "",
         override val startDate: Long? = null,
         val endDate: Long? = null,
-        override val isDone: Boolean = false,
+        val isDone: Boolean = false,
         @PrimaryKey(autoGenerate = true) var id: Int = 0
     ) : AgendaItem()
 
@@ -34,7 +33,6 @@ sealed class AgendaItem {
         override val title: String = "",
         override val description: String = "",
         override val startDate: Long? = null,
-        override val isDone: Boolean,
         @PrimaryKey(autoGenerate = true) var id: Int = 0
     ) : AgendaItem()
 

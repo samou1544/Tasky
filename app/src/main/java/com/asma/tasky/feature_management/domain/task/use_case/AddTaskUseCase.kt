@@ -16,10 +16,10 @@ class AddTaskUseCase @Inject constructor(
     operator fun invoke(task: AgendaItem.Task): Flow<Resource<Unit>> = flow {
         if (task.title.isBlank()) {
             emit(Resource.Error(message = UiText.StringResource(R.string.invalid_task)))
+            return@flow
         }
-        else {
-            repository.addTask(task)
-            emit(Resource.Success(Unit))
-        }
+        repository.addTask(task)
+        emit(Resource.Success(Unit))
+
     }
 }
