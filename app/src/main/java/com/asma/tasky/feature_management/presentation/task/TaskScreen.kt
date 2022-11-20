@@ -1,66 +1,81 @@
 package com.asma.tasky.feature_management.presentation.task
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
 import com.asma.tasky.core.presentation.ui.theme.Green
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
 import com.asma.tasky.core.presentation.ui.theme.SpaceSmall
-import com.asma.tasky.feature_management.domain.Task
-import com.asma.tasky.feature_management.domain.util.Reminder
+import com.asma.tasky.core.presentation.util.UiEvent
+import com.asma.tasky.core.util.asString
+import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.presentation.components.*
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.flow.collectLatest
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskScreen(
-    task: Task,
-    editable: Boolean = false,
+    title: String? = null,
+    description: String? = null,
     onEditTitle: (String?) -> (Unit),
-    onEditDescription: (String?) -> (Unit)
+    onEditDescription: (String?) -> (Unit),
+    onNavigateUp: () -> (Unit),
+    scaffoldState: ScaffoldState,
+    viewModel: TaskViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val timeDialogState = rememberMaterialDialogState()
     val dateDialogState = rememberMaterialDialogState()
 
-    // todo put the remembered values in the viewModel
-    val title by remember {
-        mutableStateOf(task.title)
+    val taskState by viewModel.taskState.collectAsState()
+    val taskTime by viewModel.taskTime.collectAsState()
+    val reminder by viewModel.taskReminder.collectAsState()
+
+    LaunchedEffect(key1 = true) {
+        title?.let {
+            viewModel.onEvent(TaskEvent.TitleEntered(it))
+        }
+        description?.let {
+            viewModel.onEvent(TaskEvent.DescriptionEntered(it))
+        }
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        event.uiText.asString(context),
+                        duration = SnackbarDuration.Long
+                    )
+                }
+                is UiEvent.NavigateUp -> {
+                    onNavigateUp()
+                }
+                else -> {}
+            }
+        }
     }
-    val description by remember {
-        mutableStateOf(task.description)
-    }
-    var time by remember {
-        mutableStateOf(LocalDateTime.ofEpochSecond(task.startDate!! / 1000, 0, ZoneOffset.UTC))
-    }
-    var reminder by remember {
-        mutableStateOf<Reminder>(Reminder.OneHourBefore)
-    }
-    var showReminderDropDown by remember {
-        mutableStateOf(false)
-    }
-    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +90,7 @@ fun TaskScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = onNavigateUp) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.close),
@@ -83,22 +98,34 @@ fun TaskScreen(
                 )
             }
             Text(
-                text = LocalDateTime.ofEpochSecond(task.startDate!! / 1000, 0, ZoneOffset.UTC)
-                    .format(formatter),
+                text = DateUtil.formatDate(taskTime, "dd MMMM yyyy"),
                 color = Color.White,
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold
             )
-            if (editable) {
-                Text(
-                    modifier = Modifier.padding(end = SpaceLarge),
-                    text = stringResource(R.string.save),
-                    color = Color.White,
-                    style = MaterialTheme.typography.body1,
-                    fontWeight = FontWeight.Normal
-                )
+            if (taskState.isEditable) {
+                Row {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(end = SpaceLarge)
+                            .clickable {
+                                viewModel.onEvent(TaskEvent.Save)
+                            },
+                        text = stringResource(R.string.save),
+                        color = Color.White,
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = FontWeight.Normal
+                    )
+                    if (taskState.isLoading) {
+                        Spacer(modifier = Modifier.width(SpaceSmall))
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
+                    }
+                }
             } else
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    viewModel.onEvent(TaskEvent.ToggleEditMode)
+                }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(R.string.edit),
@@ -106,7 +133,6 @@ fun TaskScreen(
                     )
                 }
         }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -142,7 +168,11 @@ fun TaskScreen(
                 }
 
                 // title
-                Title(title = title, editable = editable, onClick = onEditTitle)
+                Title(
+                    title = taskState.task.title.ifEmpty { stringResource(id = R.string.new_task) },
+                    editable = taskState.isEditable,
+                    onClick = onEditTitle
+                )
                 Divider(
                     modifier = Modifier.padding(
                         horizontal = SpaceMedium
@@ -152,9 +182,9 @@ fun TaskScreen(
 
                 // description
                 Description(
-                    description = description,
-                    editable = editable,
-                    onClick = { onEditDescription(task.description) }
+                    description = taskState.task.description.ifEmpty { stringResource(id = R.string.task_description) },
+                    editable = taskState.isEditable,
+                    onClick = onEditDescription
                 )
                 Divider(
                     modifier = Modifier.padding(
@@ -167,8 +197,8 @@ fun TaskScreen(
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 TimeSelector(
                     label = stringResource(R.string.at),
-                    startDateTime = time,
-                    editable = editable,
+                    startDateTime = taskTime,
+                    editable = taskState.isEditable,
                     onEditDate = {
                         dateDialogState.show()
                     },
@@ -187,17 +217,17 @@ fun TaskScreen(
                 Box {
                     ReminderSelector(
                         reminder = reminder,
-                        editable = editable,
+                        editable = taskState.isEditable,
                         onClick = {
-                            showReminderDropDown = true
+                            viewModel.onEvent(TaskEvent.ToggleReminderDropDown)
                         })
                     ReminderDropDown(
-                        expanded = showReminderDropDown,
+                        expanded = taskState.showReminderDropDown,
                         onDismiss = {
-                            showReminderDropDown = false
+                            viewModel.onEvent(TaskEvent.ToggleReminderDropDown)
                         },
                         onSelected = {
-                            reminder = it
+                            viewModel.onEvent(TaskEvent.ReminderSelected(it))
                         })
                 }
 
@@ -208,31 +238,33 @@ fun TaskScreen(
 
                 // Delete
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-                    DeleteText(text = "DELETE TASK")
+                    DeleteText(
+                        text = stringResource(R.string.delete_task),
+                        onDelete = { viewModel.onEvent(TaskEvent.Delete) })
                 }
             }
 
             MaterialDialog(
                 dialogState = timeDialogState,
                 buttons = {
-                    positiveButton("Ok")
-                    negativeButton("Cancel")
+                    positiveButton(stringResource(R.string.dialog_ok))
+                    negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                timepicker {
-                    time = time.with(it)
+                timepicker(initialTime = taskTime.toLocalTime()) {
+                    viewModel.onEvent(TaskEvent.TimeSelected(it))
                 }
             }
 
             MaterialDialog(
                 dialogState = dateDialogState,
                 buttons = {
-                    positiveButton("Ok")
-                    negativeButton("Cancel")
+                    positiveButton(stringResource(R.string.dialog_ok))
+                    negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                datepicker { date ->
-                    time = time.with(date)
+                datepicker(initialDate = taskTime.toLocalDate()) { date ->
+                    viewModel.onEvent(TaskEvent.DateSelected(date))
                 }
             }
         }

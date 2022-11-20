@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.asma.tasky"
-        minSdk 21
+        minSdk 26
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -21,6 +21,11 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField "String", "API_KEY", "\"${properties.getProperty("API_KEY")}\""
     }
 
     buildTypes {
@@ -91,4 +96,11 @@ dependencies {
 
     //date time picker
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
+
+    // Room
+    implementation "androidx.room:room-runtime:2.4.3"
+    kapt "androidx.room:room-compiler:2.4.3"
+
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.4.3"
 }

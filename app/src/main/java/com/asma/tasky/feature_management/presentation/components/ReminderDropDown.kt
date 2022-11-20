@@ -13,7 +13,7 @@ import com.asma.tasky.feature_management.domain.util.Reminder
 fun ReminderDropDown(expanded: Boolean, onDismiss: () -> (Unit), onSelected: (Reminder) -> (Unit)) {
     DropdownMenu(
         expanded = expanded,
-        offset = DpOffset(x = 20.dp, y = 10.dp),
+        offset = DpOffset(x = (50).dp, y = 10.dp),
         onDismissRequest = {
             onDismiss()
         }
