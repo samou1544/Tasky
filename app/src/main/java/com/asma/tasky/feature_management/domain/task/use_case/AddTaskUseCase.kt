@@ -5,9 +5,9 @@ import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
 class AddTaskUseCase @Inject constructor(
     private val repository: TaskRepository
@@ -20,6 +20,5 @@ class AddTaskUseCase @Inject constructor(
         }
         repository.addTask(task)
         emit(Resource.Success(Unit))
-
     }
 }

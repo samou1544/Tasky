@@ -38,7 +38,8 @@ fun EditFieldScreen(
             Constants.KEY_DESCRIPTION -> stringResource(id = R.string.edit_description)
             else -> key
         }
-        CustomTopBar(title = title,
+        CustomTopBar(
+            title = title,
             onClickSave = {
                 onClickSave(key, text.text)
             }, onClickBack = onBack

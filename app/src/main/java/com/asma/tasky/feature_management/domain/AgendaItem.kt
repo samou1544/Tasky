@@ -35,5 +35,4 @@ sealed class AgendaItem {
         override val startDate: Long? = null,
         @PrimaryKey(autoGenerate = true) var id: Int = 0
     ) : AgendaItem()
-
 }

@@ -5,7 +5,6 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-
 object DateUtil {
 
     fun formatDate(dateTime: LocalDateTime, pattern: String): String {

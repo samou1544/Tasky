@@ -55,13 +55,15 @@ fun Navigation(
 
         composable(
             Screen.TaskScreen.route + "?id={id}?editable={editable}",
-            arguments = listOf(navArgument("id") {
-                defaultValue = ""
-                type = NavType.StringType
-            },
+            arguments = listOf(
+                navArgument("id") {
+                    defaultValue = ""
+                    type = NavType.StringType
+                },
                 navArgument("editable") {
                     defaultValue = false
-                })
+                }
+            )
         ) {
             val title =
                 navController.currentBackStackEntry?.savedStateHandle?.get<String>(
@@ -78,10 +80,10 @@ fun Navigation(
                 onEditTitle = {
                     navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Title.key}/$it")
                 }, onEditDescription = {
-                    navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
-                }, onNavigateUp = {
-                    navController.popBackStack()
-                }, scaffoldState = scaffoldState
+                navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
+            }, onNavigateUp = {
+                navController.popBackStack()
+            }, scaffoldState = scaffoldState
             )
         }
         composable(Screen.EventScreen.route) {
