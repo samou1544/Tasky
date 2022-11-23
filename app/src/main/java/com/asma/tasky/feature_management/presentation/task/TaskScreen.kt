@@ -55,6 +55,7 @@ fun TaskScreen(
     val reminder by viewModel.taskReminder.collectAsState()
 
     LaunchedEffect(key1 = true) {
+
         title?.let {
             viewModel.onEvent(TaskEvent.TitleEntered(it))
         }
@@ -83,6 +84,7 @@ fun TaskScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -182,7 +184,7 @@ fun TaskScreen(
 
                 // description
                 Description(
-                    description = taskState.task.description.ifEmpty { stringResource(id = R.string.task_description) },
+                    description = if (taskState.task.description.isNullOrEmpty()) stringResource(id = R.string.task_description) else taskState.task.description!!,
                     editable = taskState.isEditable,
                     onClick = onEditDescription
                 )

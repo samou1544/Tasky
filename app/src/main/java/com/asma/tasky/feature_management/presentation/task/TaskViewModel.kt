@@ -1,5 +1,6 @@
 package com.asma.tasky.feature_management.presentation.task
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,8 +24,11 @@ class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     getTaskUseCase: GetTaskUseCase,
-    savedStateHandle: SavedStateHandle
+    private val  savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val _itemLiveData = savedStateHandle.getLiveData<String>("title")
+    val itemLiveData: LiveData<String> = _itemLiveData
 
     private val _taskState = MutableStateFlow(TaskState())
     val taskState = _taskState.asStateFlow()
@@ -42,6 +46,17 @@ class TaskViewModel @Inject constructor(
         savedStateHandle.get<Boolean>(Constants.PARAM_EDITABLE)?.let { editable ->
             _taskState.update {
                 it.copy(isEditable = editable)
+            }
+        }
+
+        savedStateHandle.get<String>(Constants.KEY_TITLE)?.let { title ->
+            _taskState.update {
+                it.copy(task = it.task.copy(title = title))
+            }
+        }
+        savedStateHandle.get<String>(Constants.KEY_DESCRIPTION)?.let { description ->
+            _taskState.update {
+                it.copy(task = it.task.copy(description = description))
             }
         }
 
@@ -74,7 +89,7 @@ class TaskViewModel @Inject constructor(
         _taskState.update {
             it.copy(showDeleteTask = true)
         }
-        task.startDate?.let { time ->
+        task.startDate.let { time ->
             _taskTime.update { DateUtil.secondsToLocalDateTime(time) }
         }
         _taskReminder.update {

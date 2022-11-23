@@ -4,10 +4,14 @@ import com.asma.tasky.R
 import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.domain.AgendaItem
+import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
-import javax.inject.Inject
+import com.asma.tasky.feature_management.domain.util.ModificationType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
+import java.io.IOException
+import javax.inject.Inject
 
 class AddTaskUseCase @Inject constructor(
     private val repository: TaskRepository
@@ -18,7 +22,31 @@ class AddTaskUseCase @Inject constructor(
             emit(Resource.Error(message = UiText.StringResource(R.string.invalid_task)))
             return@flow
         }
-        repository.addTask(task)
+        val rowId = repository.addTask(task)
         emit(Resource.Success(Unit))
+        try {
+            if (task.id == 0) //newly created task
+                repository.addRemoteTask(task.copy(id = rowId.toInt()))
+            else repository.updateRemoteTask(task)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            addModifiedTask(task)
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            addModifiedTask(task)
+        }
+    }
+
+    private suspend fun addModifiedTask(task:AgendaItem.Task){
+        val modifiedTask = ModifiedTask(
+            title = task.title,
+            description = task.description,
+            startDate = task.startDate,
+            reminder = task.reminder,
+            isDone = task.isDone,
+            modificationType = ModificationType.Created,
+            id = task.id
+        )
+        repository.saveModifiedTask(modifiedTask)
     }
 }

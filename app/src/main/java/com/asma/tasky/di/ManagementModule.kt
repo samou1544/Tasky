@@ -3,8 +3,8 @@ package com.asma.tasky.di
 import android.app.Application
 import androidx.room.Room
 import com.asma.tasky.feature_management.data.data_source.TaskyDatabase
-import com.asma.tasky.feature_management.data.repository.TaskRepositoryImpl
-import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
+import com.asma.tasky.feature_management.data.repository.AgendaRepositoryImpl
+import com.asma.tasky.feature_management.domain.agenda.repository.AgendaRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,9 +25,10 @@ object ManagementModule {
         ).build()
     }
 
+
     @Provides
     @Singleton
-    fun provideTaskRepository(db: TaskyDatabase): TaskRepository {
-        return TaskRepositoryImpl(db.taskyDao)
+    fun provideAgendaRepository(db: TaskyDatabase): AgendaRepository {
+        return AgendaRepositoryImpl(db.taskyDao)
     }
 }

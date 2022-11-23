@@ -3,9 +3,13 @@ package com.asma.tasky.feature_management.data.data_source
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.asma.tasky.feature_management.domain.AgendaItem
+import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 
 @Database(
-    entities = [AgendaItem.Task::class],
+    entities = [
+        AgendaItem.Task::class,
+        ModifiedTask::class
+    ],
     version = 1
 )
 abstract class TaskyDatabase : RoomDatabase() {
