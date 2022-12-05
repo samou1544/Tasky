@@ -14,10 +14,10 @@ import com.asma.tasky.feature_management.domain.task.use_case.GetTaskUseCase
 import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.domain.util.Reminder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
@@ -68,16 +68,18 @@ class TaskViewModel @Inject constructor(
         _taskState.update {
             it.copy(showDeleteTask = true)
         }
-        task.startDate?.let { time ->
+        task.startDate.let { time ->
             _taskState.update {
                 it.copy(taskTime = DateUtil.secondsToLocalDateTime(time))
             }
         }
         _taskState.update {
-            it.copy(taskReminder = computeReminder(
-                startTime = task.startDate!!,
-                reminderTime = task.reminder ?: task.startDate
-            ))
+            it.copy(
+                taskReminder = computeReminder(
+                    startTime = task.startDate,
+                    reminderTime = task.reminder ?: task.startDate
+                )
+            )
         }
         // todo check if the task is already done
     }
@@ -139,7 +141,6 @@ class TaskViewModel @Inject constructor(
                         }
                     }
                 }
-
             }
             is TaskEvent.Delete -> {
                 viewModelScope.launch {

@@ -41,7 +41,9 @@
     <string name="one_day_before">1 day before</string>
     <string name="invalid_task">Invalid task</string>
     <string name="delete_task">DELETE TASK</string>
-    <string name="dialog_ok">Ok</string>
+    <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="drop_down_arrow_content_description">drop down arrow</string>
+    <string name="today">Today</string>
 
 </resources>
