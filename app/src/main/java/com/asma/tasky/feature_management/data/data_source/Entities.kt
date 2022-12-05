@@ -14,4 +14,24 @@ data class TaskEntity(
 )
 
 
+@Entity
+data class Event(
+    val title: String = "",
+    val description: String = "",
+    val startDate: Long? = null,
+    val endDate: Long? = null,
+    val reminder: Long? = null,
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+)
+
+@Entity
+data class Reminder(
+    val title: String = "",
+    val description: String = "",
+    val startDate: Long? = null,
+    val reminder: Long? = null,
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+)
+
+
 
