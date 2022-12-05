@@ -14,9 +14,10 @@ import com.asma.tasky.feature_management.domain.task.use_case.GetTaskUseCase
 import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.domain.util.Reminder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
-import kotlinx.coroutines.flow.*
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
@@ -28,12 +29,6 @@ class TaskViewModel @Inject constructor(
 
     private val _taskState = MutableStateFlow(TaskState())
     val taskState = _taskState.asStateFlow()
-
-    private val _taskTime = MutableStateFlow(LocalDateTime.now())
-    val taskTime = _taskTime.asStateFlow()
-
-    private val _taskReminder = MutableStateFlow<Reminder>(Reminder.OneHourBefore)
-    val taskReminder = _taskReminder.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -48,9 +43,8 @@ class TaskViewModel @Inject constructor(
         val taskId = savedStateHandle.get<String>(Constants.PARAM_ID)
 
         if (!taskId.isNullOrEmpty()) {
-            // todo taskId is an Int
-            getTaskUseCase(taskId.toInt()).onEach { result ->
-                when (result) {
+            viewModelScope.launch {
+                when (val result = getTaskUseCase(taskId.toInt())) {
                     is Resource.Success -> {
                         result.data?.let { task ->
                             updateState(task)
@@ -58,7 +52,7 @@ class TaskViewModel @Inject constructor(
                     }
                     is Resource.Error -> {}
                 }
-            }.launchIn(viewModelScope)
+            }
         } else {
             // this is a new task, turn on editable mode
             _taskState.update {
@@ -75,13 +69,15 @@ class TaskViewModel @Inject constructor(
             it.copy(showDeleteTask = true)
         }
         task.startDate?.let { time ->
-            _taskTime.update { DateUtil.secondsToLocalDateTime(time) }
+            _taskState.update {
+                it.copy(taskTime = DateUtil.secondsToLocalDateTime(time))
+            }
         }
-        _taskReminder.update {
-            computeReminder(
+        _taskState.update {
+            it.copy(taskReminder = computeReminder(
                 startTime = task.startDate!!,
                 reminderTime = task.reminder ?: task.startDate
-            )
+            ))
         }
         // todo check if the task is already done
     }
@@ -99,18 +95,18 @@ class TaskViewModel @Inject constructor(
                 }
             }
             is TaskEvent.TimeSelected -> {
-                _taskTime.update {
-                    it.with(event.time)
+                _taskState.update {
+                    it.copy(taskTime = it.taskTime.with(event.time))
                 }
             }
             is TaskEvent.DateSelected -> {
-                _taskTime.update {
-                    it.with(event.date)
+                _taskState.update {
+                    it.copy(taskTime = it.taskTime.with(event.date))
                 }
             }
             is TaskEvent.ReminderSelected -> {
-                _taskReminder.update {
-                    event.reminder
+                _taskState.update {
+                    it.copy(taskReminder = event.reminder)
                 }
             }
             is TaskEvent.Save -> {
@@ -119,14 +115,14 @@ class TaskViewModel @Inject constructor(
                 }
 
                 val task = _taskState.value.task.copy(
-                    startDate = DateUtil.localDateTimeToSeconds(_taskTime.value),
+                    startDate = DateUtil.localDateTimeToSeconds(_taskState.value.taskTime),
                     isDone = false,
-                    reminder = computeReminderSeconds(_taskReminder.value, _taskTime.value),
+                    reminder = computeReminderSeconds(_taskState.value.taskReminder, _taskState.value.taskTime),
                     id = _taskState.value.task.id
                 )
 
-                addTaskUseCase(task).onEach { result ->
-                    when (result) {
+                viewModelScope.launch {
+                    when (val result = addTaskUseCase(task)) {
                         is Resource.Success -> {
                             // todo push data to server
                             _eventFlow.emit(UiEvent.NavigateUp)
@@ -142,11 +138,12 @@ class TaskViewModel @Inject constructor(
                             }
                         }
                     }
-                }.launchIn(viewModelScope)
+                }
+
             }
             is TaskEvent.Delete -> {
-                deleteTaskUseCase(_taskState.value.task).onEach { result ->
-                    when (result) {
+                viewModelScope.launch {
+                    when (val result = deleteTaskUseCase(_taskState.value.task)) {
                         is Resource.Success -> {
                             // todo remove task from server
                             _eventFlow.emit(UiEvent.NavigateUp)
@@ -165,7 +162,7 @@ class TaskViewModel @Inject constructor(
                             }
                         }
                     }
-                }.launchIn(viewModelScope)
+                }
             }
             is TaskEvent.ToggleReminderDropDown -> {
                 _taskState.update {

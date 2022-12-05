@@ -2,10 +2,9 @@ package com.asma.tasky.feature_management.data.data_source
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.asma.tasky.feature_management.domain.AgendaItem
 
 @Database(
-    entities = [AgendaItem.Task::class],
+    entities = [TaskEntity::class],
     version = 1
 )
 abstract class TaskyDatabase : RoomDatabase() {

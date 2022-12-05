@@ -16,8 +16,8 @@ class MainViewModel @Inject constructor(
     private val repository: AuthenticationRepository
 ) : ViewModel() {
 
-    private val _showMenu = MutableStateFlow(false)
-    val showMenu = _showMenu.asStateFlow()
+    private val _showAddNewMenu = MutableStateFlow(false)
+    val showAddNewMenu = _showAddNewMenu.asStateFlow()
 
     private val _isAuthenticating = MutableStateFlow(true)
     val isAuthenticating = _isAuthenticating.asStateFlow()
@@ -38,7 +38,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setShowMenu(value: Boolean) {
-        _showMenu.update {
+        _showAddNewMenu.update {
             value
         }
     }

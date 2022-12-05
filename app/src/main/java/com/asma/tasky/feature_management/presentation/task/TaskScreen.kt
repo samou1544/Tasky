@@ -51,8 +51,6 @@ fun TaskScreen(
     val dateDialogState = rememberMaterialDialogState()
 
     val taskState by viewModel.taskState.collectAsState()
-    val taskTime by viewModel.taskTime.collectAsState()
-    val reminder by viewModel.taskReminder.collectAsState()
 
     LaunchedEffect(key1 = true) {
         title?.let {
@@ -98,7 +96,7 @@ fun TaskScreen(
                 )
             }
             Text(
-                text = DateUtil.formatDate(taskTime, "dd MMMM yyyy"),
+                text = DateUtil.formatDate(taskState.taskTime, "dd MMMM yyyy"),
                 color = Color.White,
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold
@@ -197,7 +195,7 @@ fun TaskScreen(
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 TimeSelector(
                     label = stringResource(R.string.at),
-                    startDateTime = taskTime,
+                    startDateTime = taskState.taskTime,
                     editable = taskState.isEditable,
                     onEditDate = {
                         dateDialogState.show()
@@ -216,7 +214,7 @@ fun TaskScreen(
                 // Reminder
                 Box {
                     ReminderSelector(
-                        reminder = reminder,
+                        reminder = taskState.taskReminder,
                         editable = taskState.isEditable,
                         onClick = {
                             viewModel.onEvent(TaskEvent.ToggleReminderDropDown)
@@ -254,7 +252,7 @@ fun TaskScreen(
                     negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                timepicker(initialTime = taskTime.toLocalTime()) {
+                timepicker(initialTime = taskState.taskTime.toLocalTime()) {
                     viewModel.onEvent(TaskEvent.TimeSelected(it))
                 }
             }
@@ -266,7 +264,7 @@ fun TaskScreen(
                     negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                datepicker(initialDate = taskTime.toLocalDate()) { date ->
+                datepicker(initialDate = taskState.taskTime.toLocalDate()) { date ->
                     viewModel.onEvent(TaskEvent.DateSelected(date))
                 }
             }

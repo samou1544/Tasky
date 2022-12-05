@@ -1,22 +1,21 @@
 package com.asma.tasky.feature_management.data.data_source
 
 import androidx.room.*
-import com.asma.tasky.feature_management.domain.AgendaItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskyDao {
 
     // todo select tasks for a given day
-    @Query("SELECT * FROM task")
-    fun getTasksOfTheDay(): Flow<List<AgendaItem.Task>>
+    @Query("SELECT * FROM taskentity")
+    fun getTasksOfTheDay(): Flow<List<TaskEntity>>
 
-    @Query("SELECT * FROM task WHERE id = :id")
-    suspend fun getTaskById(id: Int): AgendaItem.Task?
+    @Query("SELECT * FROM taskentity WHERE id = :id")
+    suspend fun getTaskById(id: Int): TaskEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addTask(task: AgendaItem.Task)
+    suspend fun addTask(task: TaskEntity)
 
     @Delete
-    suspend fun deleteTask(task: AgendaItem.Task)
+    suspend fun deleteTask(task: TaskEntity)
 }
