@@ -18,7 +18,15 @@ class EditViewModel @Inject constructor(
     private val _text = MutableStateFlow(TextFieldState())
     val text = _text.asStateFlow()
 
+    private val _key = MutableStateFlow("")
+    val key = _key.asStateFlow()
+
     init {
+        savedStateHandle.get<String>(Constants.PARAM_TITLE)?.let { title ->
+            _key.update {
+                title
+            }
+        }
         savedStateHandle.get<String>(Constants.PARAM_TEXT)?.let { text ->
             _text.update {
                 it.copy(text = text)

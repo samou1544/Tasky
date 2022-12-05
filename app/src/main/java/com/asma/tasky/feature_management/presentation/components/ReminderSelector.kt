@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
@@ -57,9 +56,10 @@ fun ReminderSelector(editable: Boolean, reminder: Reminder, onClick: () -> (Unit
             )
         }
 
-        Icon(
-            imageVector = Icons.Outlined.KeyboardArrowRight,
-            contentDescription = "reminder icon"
-        )
+        if (editable)
+            Icon(
+                imageVector = Icons.Outlined.KeyboardArrowRight,
+                contentDescription = "reminder icon"
+            )
     }
 }
