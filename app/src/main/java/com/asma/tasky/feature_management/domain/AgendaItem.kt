@@ -2,6 +2,7 @@ package com.asma.tasky.feature_management.domain
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.asma.tasky.feature_management.domain.event.model.Attendee
 
 sealed class AgendaItem {
     abstract val title: String
@@ -23,8 +24,10 @@ sealed class AgendaItem {
         override val title: String = "",
         override val description: String? = null,
         override val startDate: Long = System.currentTimeMillis(),
-        val endDate: Long? = null,
-        val isDone: Boolean = false,
+        val endDate: Long = System.currentTimeMillis(),
+        val photos: List<String> = emptyList(),
+        val attendees: List<Attendee> = emptyList(),
+        val reminder: Long = System.currentTimeMillis(),
         @PrimaryKey(autoGenerate = true) var id: Int = 0
     ) : AgendaItem()
 

@@ -7,11 +7,11 @@ import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
 import com.asma.tasky.feature_management.domain.util.ModificationType
+import java.io.IOException
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
-import java.io.IOException
-import javax.inject.Inject
 
 class AddTaskUseCase @Inject constructor(
     private val repository: TaskRepository
@@ -25,7 +25,7 @@ class AddTaskUseCase @Inject constructor(
         val rowId = repository.addTask(task)
         emit(Resource.Success(Unit))
         try {
-            if (task.id == 0) //newly created task
+            if (task.id == 0) // newly created task
                 repository.addRemoteTask(task.copy(id = rowId.toInt()))
             else repository.updateRemoteTask(task)
         } catch (e: IOException) {
@@ -37,14 +37,14 @@ class AddTaskUseCase @Inject constructor(
         }
     }
 
-    private suspend fun addModifiedTask(task:AgendaItem.Task){
+    private suspend fun addModifiedTask(task: AgendaItem.Task) {
         val modifiedTask = ModifiedTask(
             title = task.title,
             description = task.description,
             startDate = task.startDate,
             reminder = task.reminder,
             isDone = task.isDone,
-            modificationType = ModificationType.Created,
+            modificationType = ModificationType.Created.value,
             id = task.id
         )
         repository.saveModifiedTask(modifiedTask)

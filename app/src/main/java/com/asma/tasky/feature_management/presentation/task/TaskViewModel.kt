@@ -24,7 +24,7 @@ class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     getTaskUseCase: GetTaskUseCase,
-    private val  savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _itemLiveData = savedStateHandle.getLiveData<String>("title")
@@ -49,7 +49,7 @@ class TaskViewModel @Inject constructor(
             }
         }
 
-        savedStateHandle.get<String>(Constants.KEY_TITLE)?.let { title ->
+        savedStateHandle.get<String>(Constants.PARAM_TITLE)?.let { title ->
             _taskState.update {
                 it.copy(task = it.task.copy(title = title))
             }

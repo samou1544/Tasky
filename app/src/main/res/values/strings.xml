@@ -43,5 +43,7 @@
     <string name="delete_task">DELETE TASK</string>
     <string name="dialog_ok">Ok</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="Photo">Photo</string>
+    <string name="delete_event">DELETE EVENT</string>
 
 </resources>

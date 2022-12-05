@@ -83,7 +83,6 @@ fun AgendaScreen(
                     .background(color = LightGray, shape = CircleShape)
                     .padding(SpaceSmall)
                     .clickable {
-
                     }
             )
         }
@@ -91,7 +90,6 @@ fun AgendaScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-
                 .background(
                     color = Color.White,
                     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
@@ -99,7 +97,8 @@ fun AgendaScreen(
         ) {
             Column {
                 Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(SpaceLarge)
                 ) {
@@ -126,29 +125,23 @@ fun AgendaScreen(
 
                 pastItems.forEach { item ->
                     AgendaListItem(item = item) {
-
                     }
-
                 }
                 Needle()
                 futureItems.forEach { item ->
                     AgendaListItem(item = item) {
                         onClick(item)
                     }
-
                 }
             }
-
         }
     }
 }
-
 
 @Composable
 fun DayItem(selected: Boolean = false, day: String, dayNumber: Int) {
     Column(
         modifier = Modifier
-
             .background(
                 color = if (selected) Yellow else Color.Transparent,
                 shape = CircleShape
@@ -204,11 +197,11 @@ fun AgendaListItem(item: AgendaItem, onClick: (AgendaItem) -> (Unit)) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
         ) {
-            val isDone = (item is AgendaItem.Task && item.isDone) || (item is AgendaItem.Event && item.isDone)
+            val isDone = (item is AgendaItem.Task && item.isDone)
             Row(verticalAlignment = Alignment.Top) {
                 Icon(
                     modifier = Modifier.padding(top = 2.dp),
-                    //todo check if it's done
+                    // todo check if it's done
                     imageVector = if (isDone) Icons.Outlined.CheckCircle else Icons.Outlined.Circle,
                     contentDescription = "",
                     tint = tintColor
@@ -224,7 +217,7 @@ fun AgendaListItem(item: AgendaItem, onClick: (AgendaItem) -> (Unit)) {
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
                     Text(
-                        text = item.description?: "",
+                        text = item.description ?: "",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Light,
                         color = textColor
@@ -251,7 +244,6 @@ fun AgendaListItem(item: AgendaItem, onClick: (AgendaItem) -> (Unit)) {
             fontWeight = FontWeight.Light,
             color = textColor
         )
-
     }
 }
 
@@ -275,6 +267,5 @@ fun Needle() {
                 .height(2.dp)
                 .background(color = Color.Black, shape = RectangleShape)
         )
-
     }
 }

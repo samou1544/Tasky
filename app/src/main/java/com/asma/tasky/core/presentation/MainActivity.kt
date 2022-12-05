@@ -23,15 +23,19 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
 import com.asma.tasky.R
 import com.asma.tasky.core.presentation.components.Navigation
 import com.asma.tasky.core.presentation.ui.theme.TaskyTheme
 import com.asma.tasky.core.util.Screen
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @Inject
+    lateinit var imageLoader: ImageLoader
     private val viewModel: MainViewModel by viewModels()
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -103,9 +107,10 @@ class MainActivity : ComponentActivity() {
                     ) {
                         val isLoggedIn by viewModel.isLoggedIn.collectAsState()
                         Navigation(
-                            navController,
+                            navController = navController,
                             startDestination = if (isLoggedIn) Screen.AgendaScreen.route else Screen.LoginScreen.route,
-                            scaffoldState
+                            scaffoldState = scaffoldState,
+                            imageLoader = imageLoader
                         )
                     }
                 }

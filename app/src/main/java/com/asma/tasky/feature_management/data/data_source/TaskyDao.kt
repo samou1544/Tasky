@@ -29,5 +29,4 @@ interface TaskyDao {
 
     @Query("SELECT * FROM modifiedtask")
     fun getModifiedTasks(): Flow<List<ModifiedTask>>
-
 }

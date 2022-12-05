@@ -7,7 +7,7 @@ interface TaskRepository {
 
     suspend fun getTaskById(id: Int): AgendaItem.Task?
 
-    suspend fun addTask(task: AgendaItem.Task):Long
+    suspend fun addTask(task: AgendaItem.Task): Long
 
     suspend fun deleteTask(task: AgendaItem.Task)
 
@@ -20,5 +20,4 @@ interface TaskRepository {
     suspend fun deleteRemoteTask(taskId: String)
 
     suspend fun saveModifiedTask(modifiedTask: ModifiedTask)
-
 }

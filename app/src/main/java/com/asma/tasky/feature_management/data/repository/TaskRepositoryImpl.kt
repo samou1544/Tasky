@@ -26,7 +26,7 @@ class TaskRepositoryImpl(private val dao: TaskyDao, private val api: TaskApi) : 
         return response.body()?.toAgendaItem()
     }
 
-    override suspend fun addRemoteTask(task: AgendaItem.Task){
+    override suspend fun addRemoteTask(task: AgendaItem.Task) {
         val taskDTO = TaskDTO(
             id = task.id.toString(),
             title = task.title,
@@ -35,7 +35,7 @@ class TaskRepositoryImpl(private val dao: TaskyDao, private val api: TaskApi) : 
             remindAt = task.reminder,
             isDone = task.isDone,
         )
-         api.createTask(taskDTO)
+        api.createTask(taskDTO)
     }
 
     override suspend fun updateRemoteTask(task: AgendaItem.Task) {

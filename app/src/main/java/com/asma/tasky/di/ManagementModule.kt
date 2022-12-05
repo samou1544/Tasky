@@ -25,7 +25,6 @@ object ManagementModule {
         ).build()
     }
 
-
     @Provides
     @Singleton
     fun provideAgendaRepository(db: TaskyDatabase): AgendaRepository {

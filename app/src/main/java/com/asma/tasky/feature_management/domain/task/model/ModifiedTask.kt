@@ -2,7 +2,6 @@ package com.asma.tasky.feature_management.domain.task.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.asma.tasky.feature_management.domain.util.ModificationType
 
 @Entity
 data class ModifiedTask(
@@ -11,6 +10,6 @@ data class ModifiedTask(
     val startDate: Long,
     val reminder: Long,
     val isDone: Boolean,
-    val modificationType: ModificationType,
+    val modificationType: String,
     @PrimaryKey var id: Int,
 )

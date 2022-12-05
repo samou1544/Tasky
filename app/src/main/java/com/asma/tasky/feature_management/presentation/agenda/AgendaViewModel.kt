@@ -3,11 +3,10 @@ package com.asma.tasky.feature_management.presentation.agenda
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asma.tasky.core.presentation.util.UiEvent
-import com.asma.tasky.core.util.Resource
 import com.asma.tasky.feature_management.domain.agenda.use_case.GetTasksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
 import javax.inject.Inject
+import kotlinx.coroutines.flow.*
 
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
@@ -21,7 +20,7 @@ class AgendaViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     fun getTasks() {
-        getTasksUseCase().onEach {result->
+        getTasksUseCase().onEach { result ->
             _agendaState.update {
                 it.copy(items = result)
             }
