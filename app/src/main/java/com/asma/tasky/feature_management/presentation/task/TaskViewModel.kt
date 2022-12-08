@@ -77,7 +77,7 @@ class TaskViewModel @Inject constructor(
             it.copy(
                 taskReminder = computeReminder(
                     startTime = task.startDate,
-                    reminderTime = task.reminder ?: task.startDate
+                    reminderTime = task.reminder
                 )
             )
         }

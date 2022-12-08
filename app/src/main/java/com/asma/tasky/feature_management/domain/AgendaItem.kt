@@ -10,7 +10,7 @@ sealed class AgendaItem {
         override val title: String = "",
         override val description: String = "",
         override val startDate: Long = System.currentTimeMillis(),
-        override val reminder: Long? = null,
+        override val reminder: Long = System.currentTimeMillis(),
         val isDone: Boolean = false,
         var id: Int = 0
     ) : AgendaItem()
@@ -19,8 +19,8 @@ sealed class AgendaItem {
         override val title: String = "",
         override val description: String = "",
         override val startDate: Long = System.currentTimeMillis(),
-        val endDate: Long? = null,
-        override val reminder: Long? = null,
+        val endDate: Long = System.currentTimeMillis(),
+        override val reminder: Long = System.currentTimeMillis(),
         var id: Int = 0
     ) : AgendaItem()
 
@@ -28,7 +28,7 @@ sealed class AgendaItem {
         override val title: String = "",
         override val description: String = "",
         override val startDate: Long = System.currentTimeMillis(),
-        override val reminder: Long? = null,
+        override val reminder: Long = System.currentTimeMillis(),
         var id: Int = 0
     ) : AgendaItem()
 }
