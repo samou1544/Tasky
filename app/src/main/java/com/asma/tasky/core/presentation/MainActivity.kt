@@ -50,8 +50,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val listItems = arrayOf("Event", "Task", "Reminder")
-                    val showMenu by viewModel.showMenu.collectAsState()
+                    val agendaItems = arrayOf("Event", "Task", "Reminder")
+                    val showMenu by viewModel.showAddNewMenu.collectAsState()
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val scaffoldState = rememberScaffoldState()
@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
                                             viewModel.setShowMenu(false)
                                         }
                                     ) {
-                                        listItems.forEachIndexed { index, itemValue ->
+                                        agendaItems.forEachIndexed { index, itemValue ->
                                             DropdownMenuItem(
                                                 onClick = {
                                                     viewModel.setShowMenu(false)
