@@ -2,19 +2,25 @@ package com.asma.tasky.feature_management.presentation.agenda
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.agenda.use_case.GetTasksUseCase
+import com.asma.tasky.feature_management.domain.task.use_case.AddTaskUseCase
+import com.asma.tasky.feature_management.domain.task.use_case.DeleteTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
-    private val getTasksUseCase: GetTasksUseCase
+    private val getTasksUseCase: GetTasksUseCase,
+    private val addTaskUseCase: AddTaskUseCase,
+    private val deleteTaskUseCase:DeleteTaskUseCase
 ) : ViewModel() {
 
     init {
-        //todo get username
+        // todo get username
         getTasks(LocalDate.now())
     }
 
@@ -27,5 +33,45 @@ class AgendaViewModel @Inject constructor(
                 it.copy(items = result)
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun onEvent(event: AgendaEvent) {
+        when (event) {
+            is AgendaEvent.DateSelected -> {
+                _agendaState.update {
+                    it.copy(selectedDate = event.date.atStartOfDay(), selectedDay = event.date)
+                }
+                getTasks(event.date)
+            }
+            is AgendaEvent.DaySelected -> {
+                _agendaState.update {
+                    it.copy(selectedDay = event.day)
+                }
+                getTasks(event.day)
+            }
+            is AgendaEvent.ToggleTaskIsDone -> toggleTaskDone(task = event.task)
+            is AgendaEvent.DeleteItem -> {
+                when(event.item){
+                    is AgendaItem.Task->{
+                        deleteTask(event.item)
+                    }
+                    is AgendaItem.Event -> TODO()
+                    is AgendaItem.Reminder -> TODO()
+                }
+            }
+        }
+    }
+
+    private fun toggleTaskDone(task:AgendaItem.Task){
+        viewModelScope.launch {
+            addTaskUseCase(task.copy(isDone = task.isDone.not()))
+        }
+
+    }
+
+    private fun deleteTask(task: AgendaItem.Task){
+        viewModelScope.launch {
+            deleteTaskUseCase(task)
+        }
     }
 }

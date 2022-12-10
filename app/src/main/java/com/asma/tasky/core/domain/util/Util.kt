@@ -1,7 +1,5 @@
 package com.asma.tasky.core.domain.util
 
-import java.time.LocalDateTime
-
 object Util {
 
     fun getInitials(name: String): String {

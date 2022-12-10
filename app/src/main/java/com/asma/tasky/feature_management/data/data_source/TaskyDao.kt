@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface TaskyDao {
 
     // todo select tasks for a given day
-    @Query("SELECT * FROM taskentity")
-    fun getTasksOfTheDay(): Flow<List<TaskEntity>>
+    @Query("SELECT * FROM taskentity WHERE startDate >=:startOfDay AND startDate<=:endOfDay")
+    fun getTasksOfTheDay(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM taskentity WHERE id = :id")
     suspend fun getTaskById(id: Int): TaskEntity?
