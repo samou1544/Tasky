@@ -1,10 +1,11 @@
 package com.asma.tasky.feature_management.domain
 
+
 sealed class AgendaItem {
     abstract val title: String
     abstract val description: String
     abstract val startDate: Long
-    abstract val reminder: Long?
+    abstract val reminder: Long
 
     data class Task(
         override val title: String = "",
