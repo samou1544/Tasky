@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
-import com.asma.tasky.core.domain.util.Util
+import com.asma.tasky.core.domain.util.UserUtil
 import com.asma.tasky.core.presentation.ui.theme.LightGray
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
@@ -54,20 +54,12 @@ fun AgendaScreen(
         mutableStateOf(AgendaItem.Task())
     }
 
-    val pastItems by remember {
-        derivedStateOf {
-            state.items.filter {
-                it.startDate < System.currentTimeMillis() / 1000
-            }
-        }
+    val pastItems = remember(state.items) {
+        state.items.filter { it.startDate < System.currentTimeMillis() / 1000 }
     }
 
-    val futureItems by remember {
-        derivedStateOf {
-            state.items.filter {
-                it.startDate >= System.currentTimeMillis() / 1000
-            }
-        }
+    val futureItems = remember(state.items) {
+        state.items.filter { it.startDate >= System.currentTimeMillis() / 1000 }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -105,7 +97,7 @@ fun AgendaScreen(
 
                 if (state.userName.isNotEmpty())
                     Text(
-                        text = Util.getInitials(state.userName),
+                        text = UserUtil.getInitials(state.userName),
                         modifier = Modifier
                             .padding(SpaceSmall)
                             .background(color = LightGray, shape = CircleShape)
