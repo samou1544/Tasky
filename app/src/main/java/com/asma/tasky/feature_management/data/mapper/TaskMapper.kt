@@ -3,7 +3,7 @@ package com.asma.tasky.feature_management.data.mapper
 import com.asma.tasky.feature_management.data.data_source.TaskEntity
 import com.asma.tasky.feature_management.domain.AgendaItem
 
-fun TaskEntity.toAgendaItem(): AgendaItem.Task {
+fun TaskEntity.toAgendaTask(): AgendaItem.Task {
     return AgendaItem.Task(
         title = title,
         description = description,
@@ -24,4 +24,3 @@ fun AgendaItem.Task.toTaskEntity(): TaskEntity {
         id = id
     )
 }
-
