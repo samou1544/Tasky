@@ -17,137 +17,220 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asma.tasky.R
-import com.asma.tasky.core.domain.util.Util
+import com.asma.tasky.core.domain.util.UserUtil
 import com.asma.tasky.core.presentation.ui.theme.LightGray
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
 import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
 import com.asma.tasky.core.presentation.ui.theme.SpaceSmall
 import com.asma.tasky.feature_management.domain.AgendaItem
+import com.asma.tasky.feature_management.domain.util.ActionsMenu
 import com.asma.tasky.feature_management.presentation.agenda.components.AgendaListItem
 import com.asma.tasky.feature_management.presentation.agenda.components.DayItem
+import com.asma.tasky.feature_management.presentation.agenda.components.DeleteAlertDialog
 import com.asma.tasky.feature_management.presentation.agenda.components.Needle
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.util.*
 
-@Preview
 @Composable
 fun AgendaScreen(
     viewModel: AgendaViewModel = hiltViewModel(),
-    onClick: (AgendaItem) -> Unit = {}
+    onNavigate: (item: AgendaItem, editable: Boolean) -> Unit
 ) {
     val state by viewModel.agendaState.collectAsState()
-
-    val pastItems by remember {
-        derivedStateOf {
-            state.items.filter {
-                it.startDate < System.currentTimeMillis() / 1000
-            }
-        }
-    }
-
-    val futureItems by remember {
-        derivedStateOf {
-            state.items.filter {
-                it.startDate >= System.currentTimeMillis() / 1000
-            }
-        }
+    val dateDialogState = rememberMaterialDialogState()
+    var showAlertDialog by remember {
+        mutableStateOf(false)
     }
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = SpaceMedium, vertical = SpaceSmall)
-        ) {
-            Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = state.selectedDate.month.name.capitalize(Locale.US),
-                        color = Color.White,
-                        fontSize = 18.sp
-                    )
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = stringResource(R.string.drop_down_arrow_content_description),
-                        tint = Color.White
-                    )
-                }
-            }
+    var selectedItem: AgendaItem by remember {
+        mutableStateOf(AgendaItem.Task())
+    }
 
-            if (state.userName.isNotEmpty())
-                Text(
-                    text = Util.getInitials(state.userName),
-                    modifier = Modifier
-                        .padding(SpaceSmall)
-                        .background(color = LightGray, shape = CircleShape)
-                        .padding(SpaceSmall)
-                        .clickable {
-                        }
-                )
-        }
+    val pastItems = remember(state.items) {
+        state.items.filter { it.startDate < System.currentTimeMillis() / 1000 }
+    }
 
-        Box(
+    val futureItems = remember(state.items) {
+        state.items.filter { it.startDate >= System.currentTimeMillis() / 1000 }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-                )
+                .background(color = Color.Black),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(SpaceLarge)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = SpaceMedium, vertical = SpaceSmall)
+            ) {
+                Button(
+                    onClick = { dateDialogState.show() },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)
                 ) {
-                    repeat(7) {
-                        DayItem(
-                            selected = it == 0,
-                            state.selectedDate.plusDays(it.toLong()),
-                            onCLick = {
-                                // TODO update selected day
-                            }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = state.selectedDate.month.name.capitalize(Locale.ENGLISH),
+                            color = Color.White,
+                            fontSize = 18.sp
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = stringResource(R.string.drop_down_arrow_content_description),
+                            tint = Color.White
                         )
                     }
                 }
 
-                Text(
-                    text = if (state.selectedDate.toLocalDate() == LocalDate.now()) stringResource(R.string.today)
-                    else state.selectedDate.dayOfWeek.name,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = SpaceLarge)
-                )
+                if (state.userName.isNotEmpty())
+                    Text(
+                        text = UserUtil.getInitials(state.userName),
+                        modifier = Modifier
+                            .padding(SpaceSmall)
+                            .background(color = LightGray, shape = CircleShape)
+                            .padding(SpaceSmall)
+                            .clickable {
+                            }
+                    )
+            }
 
-                pastItems.forEach { item ->
-                    AgendaListItem(item = item) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
+                    )
+            ) {
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(SpaceLarge)
+                    ) {
+                        repeat(7) {
+                            val day = state.selectedDate.plusDays(it.toLong())
+                            DayItem(
+                                modifier = Modifier.weight(1f),
+                                selected = day.toLocalDate() == state.selectedDay,
+                                day = day,
+                                onCLick = { day ->
+                                    viewModel.onEvent(AgendaEvent.DaySelected(day.toLocalDate()))
+                                }
+                            )
+                        }
                     }
-                }
-                Needle()
-                futureItems.forEach { item ->
-                    AgendaListItem(item = item) {
-                        onClick(item)
+
+                    Text(
+                        text = if (state.selectedDay == LocalDate.now()) stringResource(
+                            R.string.today
+                        )
+                        else state.selectedDay.dayOfWeek.name,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = SpaceLarge)
+                    )
+
+                    pastItems.forEach { item ->
+                        AgendaListItem(
+                            item = item,
+                            onClick = {
+                                onNavigate(item, false)
+                            },
+                            onActionSelected = { action ->
+                                when (action) {
+                                    is ActionsMenu.Open -> {
+                                        onNavigate(item, false)
+                                    }
+                                    is ActionsMenu.Delete -> {
+                                        selectedItem = item
+                                        showAlertDialog = true
+                                    }
+                                    is ActionsMenu.Edit -> {
+                                        onNavigate(item, true)
+                                    }
+                                }
+                            },
+                            toggleIsDone = {
+                                if (item is AgendaItem.Task)
+                                    viewModel.onEvent(AgendaEvent.ToggleTaskIsDone(item))
+                            }
+                        )
+                    }
+                    Needle()
+                    futureItems.forEach { item ->
+                        AgendaListItem(
+                            item = item,
+                            onClick = {
+                                onNavigate(item, false)
+                            },
+                            onActionSelected = { action ->
+                                when (action) {
+                                    is ActionsMenu.Open -> {
+                                        onNavigate(item, false)
+                                    }
+                                    is ActionsMenu.Delete -> {
+                                        selectedItem = item
+                                        showAlertDialog = true
+                                    }
+                                    is ActionsMenu.Edit -> {
+                                        onNavigate(item, true)
+                                    }
+                                }
+                            },
+                            toggleIsDone = {
+                                if (item is AgendaItem.Task)
+                                    viewModel.onEvent(AgendaEvent.ToggleTaskIsDone(item))
+                            }
+                        )
                     }
                 }
             }
         }
+
+        MaterialDialog(
+            dialogState = dateDialogState,
+            buttons = {
+                positiveButton(stringResource(R.string.dialog_ok))
+                negativeButton(stringResource(R.string.dialog_cancel))
+            }
+        ) {
+            datepicker(initialDate = state.selectedDate.toLocalDate()) { date ->
+                viewModel.onEvent(AgendaEvent.DateSelected(date))
+            }
+        }
+        if (showAlertDialog)
+            selectedItem.let { item ->
+                val text = when (item) {
+                    is AgendaItem.Task -> "task"
+                    is AgendaItem.Event -> "event"
+                    is AgendaItem.Reminder -> "reminder"
+                }
+                DeleteAlertDialog(
+                    onCancel = { showAlertDialog = false },
+                    onDelete = {
+                        showAlertDialog = false
+                        viewModel.onEvent(AgendaEvent.DeleteItem(item))
+                    },
+                    text = text
+                )
+            }
+
+
     }
 }
+
