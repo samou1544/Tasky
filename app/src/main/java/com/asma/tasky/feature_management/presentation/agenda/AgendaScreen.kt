@@ -30,6 +30,7 @@ import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.util.ActionsMenu
 import com.asma.tasky.feature_management.presentation.agenda.components.AgendaListItem
 import com.asma.tasky.feature_management.presentation.agenda.components.DayItem
+import com.asma.tasky.feature_management.presentation.agenda.components.DeleteAlertDialog
 import com.asma.tasky.feature_management.presentation.agenda.components.Needle
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -44,6 +45,14 @@ fun AgendaScreen(
 ) {
     val state by viewModel.agendaState.collectAsState()
     val dateDialogState = rememberMaterialDialogState()
+    var showAlertDialog by remember {
+        mutableStateOf(false)
+    }
+
+
+    var selectedItem: AgendaItem by remember {
+        mutableStateOf(AgendaItem.Task())
+    }
 
     val pastItems by remember {
         derivedStateOf {
@@ -156,7 +165,8 @@ fun AgendaScreen(
                                         onNavigate(item, false)
                                     }
                                     is ActionsMenu.Delete -> {
-                                        viewModel.onEvent(AgendaEvent.DeleteItem(item))
+                                        selectedItem = item
+                                        showAlertDialog = true
                                     }
                                     is ActionsMenu.Edit -> {
                                         onNavigate(item, true)
@@ -182,7 +192,8 @@ fun AgendaScreen(
                                         onNavigate(item, false)
                                     }
                                     is ActionsMenu.Delete -> {
-                                        viewModel.onEvent(AgendaEvent.DeleteItem(item))
+                                        selectedItem = item
+                                        showAlertDialog = true
                                     }
                                     is ActionsMenu.Edit -> {
                                         onNavigate(item, true)
@@ -210,5 +221,24 @@ fun AgendaScreen(
                 viewModel.onEvent(AgendaEvent.DateSelected(date))
             }
         }
+        if (showAlertDialog)
+            selectedItem.let { item ->
+                val text = when (item) {
+                    is AgendaItem.Task -> "task"
+                    is AgendaItem.Event -> "event"
+                    is AgendaItem.Reminder -> "reminder"
+                }
+                DeleteAlertDialog(
+                    onCancel = { showAlertDialog = false },
+                    onDelete = {
+                        showAlertDialog = false
+                        viewModel.onEvent(AgendaEvent.DeleteItem(item))
+                    },
+                    text = text
+                )
+            }
+
+
     }
 }
+
