@@ -14,7 +14,7 @@ class UserUtilTest {
     }
 
     @Test
-    fun `name containing only first name and last name returns one initial`() {
+    fun `name containing only first name returns one initial`() {
         val name = "Asma"
         val initials = UserUtil.getInitials(name)
         val expected = "A"
