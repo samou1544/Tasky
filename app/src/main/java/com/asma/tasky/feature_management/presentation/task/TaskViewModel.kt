@@ -3,6 +3,7 @@ package com.asma.tasky.feature_management.presentation.task
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asma.tasky.feature_management.domain.reminder.ReminderManager
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.Constants
 import com.asma.tasky.core.util.Resource
@@ -14,15 +15,16 @@ import com.asma.tasky.feature_management.domain.task.use_case.GetTaskUseCase
 import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.domain.util.Reminder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val reminderManager: ReminderManager,
     getTaskUseCase: GetTaskUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -88,12 +90,12 @@ class TaskViewModel @Inject constructor(
         when (event) {
             is TaskEvent.TitleEntered -> {
                 _taskState.update {
-                    it.copy(task = it.task.copy(title = event.title))
+                    it.copy(task = it.task.copy(taskTitle = event.title))
                 }
             }
             is TaskEvent.DescriptionEntered -> {
                 _taskState.update {
-                    it.copy(task = it.task.copy(description = event.description))
+                    it.copy(task = it.task.copy(taskDescription = event.description))
                 }
             }
             is TaskEvent.TimeSelected -> {
@@ -117,15 +119,19 @@ class TaskViewModel @Inject constructor(
                 }
 
                 val task = _taskState.value.task.copy(
-                    startDate = DateUtil.localDateTimeToSeconds(_taskState.value.taskTime),
+                    taskStartDate = DateUtil.localDateTimeToSeconds(_taskState.value.taskTime),
                     isDone = false,
-                    reminder = computeReminderSeconds(_taskState.value.taskReminder, _taskState.value.taskTime),
-                    id = _taskState.value.task.id
+                    taskReminder = computeReminderSeconds(
+                        _taskState.value.taskReminder,
+                        _taskState.value.taskTime
+                    ),
+                    taskId = _taskState.value.task.id
                 )
 
                 viewModelScope.launch {
                     when (val result = addTaskUseCase(task)) {
                         is Resource.Success -> {
+                            reminderManager.startReminderWorker(agendaItem = task)
                             // todo push data to server
                             _eventFlow.emit(UiEvent.NavigateUp)
                         }
@@ -147,10 +153,12 @@ class TaskViewModel @Inject constructor(
                     when (val result = deleteTaskUseCase(_taskState.value.task)) {
                         is Resource.Success -> {
                             // todo remove task from server
-                            _eventFlow.emit(UiEvent.NavigateUp)
+                            reminderManager.cancelReminderWorker(agendaItem = _taskState.value.task)
                             _taskState.update {
                                 it.copy(isLoading = false)
                             }
+                            _eventFlow.emit(UiEvent.NavigateUp)
+
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(
@@ -204,4 +212,6 @@ class TaskViewModel @Inject constructor(
             }
         }
     }
+
+
 }

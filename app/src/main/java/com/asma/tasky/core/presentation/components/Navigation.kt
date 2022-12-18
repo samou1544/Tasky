@@ -1,5 +1,6 @@
 package com.asma.tasky.core.presentation.components
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.asma.tasky.core.util.Constants
 import com.asma.tasky.core.util.Screen
 import com.asma.tasky.feature_authentication.presentation.login.LoginScreen
@@ -64,6 +66,12 @@ fun Navigation(
 
         composable(
             Screen.TaskScreen.route + "?id={id}&editable={editable}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "tasky.asma.com/task/{id}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
             arguments = listOf(
                 navArgument("id") {
                     defaultValue = ""
