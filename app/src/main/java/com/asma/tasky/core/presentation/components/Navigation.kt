@@ -14,6 +14,7 @@ import com.asma.tasky.core.util.Constants
 import com.asma.tasky.core.util.Screen
 import com.asma.tasky.feature_authentication.presentation.login.LoginScreen
 import com.asma.tasky.feature_authentication.presentation.register.RegisterScreen
+import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.presentation.agenda.AgendaScreen
 import com.asma.tasky.feature_management.presentation.edit.EditFieldScreen
 import com.asma.tasky.feature_management.presentation.edit.EditableField
@@ -50,11 +51,19 @@ fun Navigation(
             }, scaffoldState = scaffoldState)
         }
         composable(Screen.AgendaScreen.route) {
-            AgendaScreen()
+            AgendaScreen(onNavigate = { agendaItem, editable ->
+                when (agendaItem) {
+                    is AgendaItem.Event -> {}
+                    is AgendaItem.Reminder -> {}
+                    is AgendaItem.Task -> {
+                        navController.navigate(Screen.TaskScreen.route + "?id=${agendaItem.id}&editable=$editable")
+                    }
+                }
+            })
         }
 
         composable(
-            Screen.TaskScreen.route + "?id={id}?editable={editable}",
+            Screen.TaskScreen.route + "?id={id}&editable={editable}",
             arguments = listOf(
                 navArgument("id") {
                     defaultValue = ""

@@ -45,5 +45,7 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="drop_down_arrow_content_description">drop down arrow</string>
     <string name="today">Today</string>
+    <string name="open">Open</string>
+    <string name="delete">Delete</string>
 
 </resources>
