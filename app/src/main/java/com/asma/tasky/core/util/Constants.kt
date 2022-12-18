@@ -16,7 +16,9 @@ object Constants {
 
     const val PARAM_TEXT = "text"
     const val PARAM_TITLE = "title"
+    const val PARAM_IMAGE_URL = "imageUrl"
+    const val PARAM_DELETED_IMAGE = "deletedImage"
 
-    const val KEY_TITLE = "title"
     const val KEY_DESCRIPTION = "description"
+
 }

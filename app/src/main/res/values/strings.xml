@@ -47,5 +47,7 @@
     <string name="today">Today</string>
     <string name="open">Open</string>
     <string name="delete">Delete</string>
+    <string name="Photo">Photo</string>
+    <string name="delete_event">DELETE EVENT</string>
 
 </resources>
