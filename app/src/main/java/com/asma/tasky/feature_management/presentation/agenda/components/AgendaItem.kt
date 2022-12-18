@@ -22,8 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.asma.tasky.core.presentation.ui.theme.*
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.util.ActionsMenu
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import com.asma.tasky.feature_management.domain.util.DateUtil
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -132,7 +131,7 @@ fun AgendaListItem(
         }
 
         val formatter = DateTimeFormatter.ofPattern("MMM dd, hh:mm")
-        val time = LocalDateTime.ofEpochSecond(item.startDate, 0, ZoneOffset.UTC)
+        val time = DateUtil.secondsToLocalDateTime(item.startDate)
 
         Text(
             modifier = Modifier.padding(end = SpaceMedium, bottom = SpaceSmall),

@@ -4,12 +4,17 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
-import com.asma.tasky.core.domain.notification_service.ReminderNotificationService
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import com.asma.tasky.feature_management.domain.notification_service.ReminderNotificationService
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class TaskyApp : Application(){
+class TaskyApp : Application(), Configuration.Provider {
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
@@ -24,7 +29,14 @@ class TaskyApp : Application(){
         )
         channel.description = "Reminder notifications for tasks, events and reminders"
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
+
+
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }

@@ -3,10 +3,7 @@ package com.asma.tasky.feature_management.presentation.task
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
-import com.asma.tasky.core.domain.reminder.ReminderWorker
+import com.asma.tasky.feature_management.domain.reminder.ReminderManager
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.Constants
 import com.asma.tasky.core.util.Resource
@@ -21,14 +18,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
-    private val workManager: WorkManager,
+    private val reminderManager: ReminderManager,
     getTaskUseCase: GetTaskUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -94,12 +90,12 @@ class TaskViewModel @Inject constructor(
         when (event) {
             is TaskEvent.TitleEntered -> {
                 _taskState.update {
-                    it.copy(task = it.task.copy(title = event.title))
+                    it.copy(task = it.task.copy(taskTitle = event.title))
                 }
             }
             is TaskEvent.DescriptionEntered -> {
                 _taskState.update {
-                    it.copy(task = it.task.copy(description = event.description))
+                    it.copy(task = it.task.copy(taskDescription = event.description))
                 }
             }
             is TaskEvent.TimeSelected -> {
@@ -123,23 +119,21 @@ class TaskViewModel @Inject constructor(
                 }
 
                 val task = _taskState.value.task.copy(
-                    startDate = DateUtil.localDateTimeToSeconds(_taskState.value.taskTime),
+                    taskStartDate = DateUtil.localDateTimeToSeconds(_taskState.value.taskTime),
                     isDone = false,
-                    reminder = computeReminderSeconds(
+                    taskReminder = computeReminderSeconds(
                         _taskState.value.taskReminder,
                         _taskState.value.taskTime
                     ),
-                    id = _taskState.value.task.id
+                    taskId = _taskState.value.task.id
                 )
 
                 viewModelScope.launch {
                     when (val result = addTaskUseCase(task)) {
                         is Resource.Success -> {
+                            reminderManager.startReminderWorker(agendaItem = task)
                             // todo push data to server
                             _eventFlow.emit(UiEvent.NavigateUp)
-                            //todo schedule reminder
-                            startReminderWorker()
-
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(
@@ -159,10 +153,12 @@ class TaskViewModel @Inject constructor(
                     when (val result = deleteTaskUseCase(_taskState.value.task)) {
                         is Resource.Success -> {
                             // todo remove task from server
-                            _eventFlow.emit(UiEvent.NavigateUp)
+                            reminderManager.cancelReminderWorker(agendaItem = _taskState.value.task)
                             _taskState.update {
                                 it.copy(isLoading = false)
                             }
+                            _eventFlow.emit(UiEvent.NavigateUp)
+
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(
@@ -217,23 +213,5 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    private fun startReminderWorker() {
-        val delay = (_taskState.value.task.reminder - System.currentTimeMillis()) / 1000
-        if (delay > 0) {
-            val work = OneTimeWorkRequestBuilder<ReminderWorker>()
-                .setInitialDelay(delay, TimeUnit.SECONDS)
-                .setInputData(
-                    workDataOf(
-                        "id" to _taskState.value.task.id,
-                        "type" to "task"
-                    )
-                )
-                .build()
 
-            viewModelScope.launch {
-                workManager.enqueue(work)
-            }
-        }
-
-    }
 }
