@@ -2,6 +2,7 @@ package com.asma.tasky.feature_management.data.data_source
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 
 @Database(
     entities = [

@@ -1,40 +1,44 @@
 package com.asma.tasky.feature_management.domain.task.use_case
 
 import com.asma.tasky.core.util.Resource
-import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.domain.AgendaItem
+import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
+import com.asma.tasky.feature_management.domain.util.ModificationType
+import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import retrofit2.HttpException
 
 class DeleteTaskUseCase @Inject constructor(
     private val repository: TaskRepository
 ) {
 
-    operator fun invoke(task: AgendaItem.Task): Flow<Resource<Unit>> = flow {
+    suspend operator fun invoke(task: AgendaItem.Task): Resource<Unit> {
         repository.deleteTask(task)
-        emit(Resource.Success(Unit))
         try {
             repository.deleteRemoteTask(task.id.toString())
         } catch (e: IOException) {
             e.printStackTrace()
-            emit(
-                Resource.Error(
-                    if (e.message != null) UiText.DynamicString(e.message!!)
-                    else UiText.unknownError()
-                )
-            )
+            addModifiedTask(task)
+
         } catch (e: HttpException) {
             e.printStackTrace()
-            emit(
-                Resource.Error(
-                    if (e.message != null) UiText.DynamicString(e.message!!)
-                    else UiText.unknownError()
-                )
-            )
+            addModifiedTask(task)
         }
+        return Resource.Success(Unit)
+
+    }
+
+    private suspend fun addModifiedTask(task: AgendaItem.Task) {
+        val modifiedTask = ModifiedTask(
+            title = task.title,
+            description = task.description,
+            startDate = task.startDate,
+            reminder = task.reminder,
+            isDone = task.isDone,
+            modificationType = ModificationType.Deleted.value,
+            id = task.id
+        )
+        repository.saveModifiedTask(modifiedTask)
     }
 }

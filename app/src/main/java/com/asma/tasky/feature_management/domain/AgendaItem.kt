@@ -7,13 +7,13 @@ import kotlinx.parcelize.Parcelize
 sealed class AgendaItem(
     val id: Int,
     val title: String,
-    val description: String,
+    val description: String?,
     val startDate: Long,
     val reminder: Long,
 ) : Parcelable {
     @Parcelize data class Task(
         val taskTitle: String = "",
-        val taskDescription: String = "",
+        val taskDescription: String? = "",
         val taskStartDate: Long = System.currentTimeMillis(),
         val taskReminder: Long = System.currentTimeMillis(),
         val isDone: Boolean = false,

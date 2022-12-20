@@ -2,6 +2,7 @@ package com.asma.tasky.feature_management.data.data_source
 
 import androidx.room.*
 import com.asma.tasky.feature_management.domain.AgendaItem
+import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,10 +16,10 @@ interface TaskyDao {
     suspend fun getTaskById(id: Int): TaskEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addTask(task: AgendaItem.Task): Long
+    suspend fun addTask(task: TaskEntity): Long
 
     @Delete
-    suspend fun deleteTask(task: AgendaItem.Task)
+    suspend fun deleteTask(task: TaskEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addModifiedTask(task: ModifiedTask): Long

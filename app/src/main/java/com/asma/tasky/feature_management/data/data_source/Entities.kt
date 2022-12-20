@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class TaskEntity(
     val title: String,
-    val description: String,
+    val description: String?,
     val startDate: Long,
     val reminder: Long,
     val isDone: Boolean,

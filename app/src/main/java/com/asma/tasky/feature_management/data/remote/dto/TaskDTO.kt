@@ -12,12 +12,12 @@ data class TaskDTO(
 ) {
     fun toAgendaItem(): AgendaItem.Task {
         return AgendaItem.Task(
-            title = title,
-            description = description,
-            startDate = time,
-            reminder = remindAt,
+            taskTitle = title,
+            taskDescription = description,
+            taskStartDate = time,
+            taskReminder = remindAt,
             isDone = isDone,
-            id = id.toInt()
+            taskId = id.toInt()
         )
     }
 }

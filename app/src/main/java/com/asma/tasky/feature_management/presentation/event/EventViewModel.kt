@@ -17,10 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
-    private val addTaskUseCase: AddTaskUseCase,
-    private val deleteTaskUseCase: DeleteTaskUseCase,
-    getTaskUseCase: GetTaskUseCase,
-    private val savedStateHandle: SavedStateHandle
+   savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _eventPhotos = MutableStateFlow<List<String>>(emptyList())
@@ -90,12 +87,12 @@ class EventViewModel @Inject constructor(
             }
             is EventEvent.TitleEntered -> {
                 _eventState.update {
-                    it.copy(event = it.event.copy(title = event.title))
+                    it.copy(event = it.event.copy(eventTitle = event.title))
                 }
             }
             is EventEvent.DescriptionEntered -> {
                 _eventState.update {
-                    it.copy(event = it.event.copy(description = event.description))
+                    it.copy(event = it.event.copy(eventDescription = event.description))
                 }
             }
             is EventEvent.TimeSelected -> {

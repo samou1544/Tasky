@@ -9,24 +9,21 @@ import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
 import com.asma.tasky.feature_management.domain.util.ModificationType
 import java.io.IOException
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 
 class AddTaskUseCase @Inject constructor(
     private val repository: TaskRepository
 ) {
 
-    operator fun invoke(task: AgendaItem.Task): Flow<Resource<Unit>> = flow {
+    suspend operator fun invoke(task: AgendaItem.Task): Resource<Unit> {
         if (task.title.isBlank()) {
-            emit(Resource.Error(message = UiText.StringResource(R.string.invalid_task)))
-            return@flow
+            return Resource.Error(message = UiText.StringResource(R.string.invalid_task))
         }
         val rowId = repository.addTask(task)
-        emit(Resource.Success(Unit))
+
         try {
             if (task.id == 0) // newly created task
-                repository.addRemoteTask(task.copy(id = rowId.toInt()))
+                repository.addRemoteTask(task.copy(taskId = rowId.toInt()))
             else repository.updateRemoteTask(task)
         } catch (e: IOException) {
             e.printStackTrace()
@@ -35,6 +32,7 @@ class AddTaskUseCase @Inject constructor(
             e.printStackTrace()
             addModifiedTask(task)
         }
+        return Resource.Success(Unit)
     }
 
     private suspend fun addModifiedTask(task: AgendaItem.Task) {

@@ -10,15 +10,15 @@ interface TaskApi {
     @POST("/task")
     suspend fun createTask(
         @Body request: TaskDTO
-    ): BasicResponse<Unit>
+    )
 
     @PUT("/task")
     suspend fun updateTask(
         @Body request: TaskDTO
-    ): BasicResponse<Unit>
+    )
 
     @GET("/task")
-    suspend fun getTask(@Query("taskId") taskId: String): Response<TaskDTO>
+    suspend fun getTask(@Query("taskId") taskId: String): TaskDTO
 
     @DELETE("/task")
     suspend fun deleteTask(
