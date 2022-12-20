@@ -5,12 +5,12 @@ import com.asma.tasky.feature_management.domain.AgendaItem
 
 fun TaskEntity.toAgendaTask(): AgendaItem.Task {
     return AgendaItem.Task(
-        title = title,
-        description = description,
-        startDate = startDate,
-        reminder = reminder,
+        taskTitle = title,
+        taskDescription = description,
+        taskStartDate = startDate,
+        taskReminder = reminder,
         isDone = isDone,
-        id = id
+        taskId = id
     )
 }
 

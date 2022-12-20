@@ -1,34 +1,57 @@
 package com.asma.tasky.feature_management.domain
 
-sealed class AgendaItem {
-    abstract val title: String
-    abstract val description: String
-    abstract val startDate: Long
-    abstract val reminder: Long?
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-    data class Task(
-        override val title: String = "",
-        override val description: String = "",
-        override val startDate: Long = System.currentTimeMillis(),
-        override val reminder: Long = System.currentTimeMillis(),
+
+sealed class AgendaItem(
+    val id: Int,
+    val title: String,
+    val description: String,
+    val startDate: Long,
+    val reminder: Long,
+) : Parcelable {
+    @Parcelize data class Task(
+        val taskTitle: String = "",
+        val taskDescription: String = "",
+        val taskStartDate: Long = System.currentTimeMillis(),
+        val taskReminder: Long = System.currentTimeMillis(),
         val isDone: Boolean = false,
-        var id: Int = 0
-    ) : AgendaItem()
+        var taskId: Int = 0
+    ) : AgendaItem(
+        id = taskId,
+        title = taskTitle,
+        description = taskDescription,
+        startDate = taskStartDate,
+        reminder = taskReminder
+    )
 
-    data class Event(
-        override val title: String = "",
-        override val description: String = "",
-        override val startDate: Long = System.currentTimeMillis(),
-        val endDate: Long = System.currentTimeMillis(),
-        override val reminder: Long = System.currentTimeMillis(),
-        var id: Int = 0
-    ) : AgendaItem()
+    @Parcelize  data class Event(
+         val eventTitle: String = "",
+         val eventDescription: String = "",
+         val eventStartDate: Long = System.currentTimeMillis(),
+        val eventEndDate: Long = System.currentTimeMillis(),
+         val eventReminder: Long = System.currentTimeMillis(),
+         var eventId: Int = 0
+    ) : AgendaItem(
+        id = eventId,
+        title = eventTitle,
+        description = eventDescription,
+        startDate = eventStartDate,
+        reminder = eventReminder
+    )
 
-    data class Reminder(
-        override val title: String = "",
-        override val description: String = "",
-        override val startDate: Long = System.currentTimeMillis(),
-        override val reminder: Long = System.currentTimeMillis(),
-        var id: Int = 0
-    ) : AgendaItem()
+    @Parcelize  data class Reminder(
+         val reminderTitle: String = "",
+         val reminderDescription: String = "",
+         val reminderStartDate: Long = System.currentTimeMillis(),
+         val reminderReminder: Long = System.currentTimeMillis(),
+         var reminderId: Int = 0
+    ) : AgendaItem(
+        id = reminderId,
+        title = reminderTitle,
+        description = reminderDescription,
+        startDate = reminderStartDate,
+        reminder = reminderReminder
+    )
 }
