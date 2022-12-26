@@ -11,7 +11,7 @@ import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
 
 class TaskRepositoryImpl(private val dao: TaskyDao, private val api: TaskApi) : TaskRepository {
 
-    override suspend fun getTaskById(id: Int): AgendaItem.Task? {
+    override suspend fun getTaskById(id: String): AgendaItem.Task? {
         return dao.getTaskById(id)?.toAgendaTask()
     }
 
@@ -23,8 +23,8 @@ class TaskRepositoryImpl(private val dao: TaskyDao, private val api: TaskApi) : 
          dao.deleteTask(task.toTaskEntity())
     }
 
-    override suspend fun getRemoteTaskById(id: Int): AgendaItem.Task {
-        val response = api.getTask(id.toString())
+    override suspend fun getRemoteTaskById(id: String): AgendaItem.Task {
+        val response = api.getTask(id)
         return response.toAgendaItem()
     }
 

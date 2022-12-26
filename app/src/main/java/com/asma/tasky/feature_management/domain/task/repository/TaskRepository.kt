@@ -5,13 +5,13 @@ import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 
 interface TaskRepository {
 
-    suspend fun getTaskById(id: Int): AgendaItem.Task?
+    suspend fun getTaskById(id: String): AgendaItem.Task?
 
     suspend fun addTask(task: AgendaItem.Task)
 
     suspend fun deleteTask(task: AgendaItem.Task)
 
-    suspend fun getRemoteTaskById(id: Int): AgendaItem.Task?
+    suspend fun getRemoteTaskById(id: String): AgendaItem.Task?
 
     suspend fun addRemoteTask(task: AgendaItem.Task)
 

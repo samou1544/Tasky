@@ -12,7 +12,7 @@ class GetTaskUseCase @Inject constructor(
     private val repository: TaskRepository
 ) {
 
-    suspend operator fun invoke(id: Int): Resource<AgendaItem.Task?> {
+    suspend operator fun invoke(id: String): Resource<AgendaItem.Task?> {
         val result = repository.getTaskById(id)
         try {
             val remoteTask = repository.getRemoteTaskById(id)

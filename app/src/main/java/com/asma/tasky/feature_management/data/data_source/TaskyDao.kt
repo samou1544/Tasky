@@ -13,7 +13,7 @@ interface TaskyDao {
     fun getTasksOfTheDay(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM taskentity WHERE id = :id")
-    suspend fun getTaskById(id: Int): TaskEntity?
+    suspend fun getTaskById(id: String): TaskEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTask(task: TaskEntity): Long

@@ -46,7 +46,7 @@ class TaskViewModel @Inject constructor(
 
         if (!taskId.isNullOrEmpty()) {
             viewModelScope.launch {
-                when (val result = getTaskUseCase(taskId.toInt())) {
+                when (val result = getTaskUseCase(taskId)) {
                     is Resource.Success -> {
                         result.data?.let { task ->
                             updateState(task)

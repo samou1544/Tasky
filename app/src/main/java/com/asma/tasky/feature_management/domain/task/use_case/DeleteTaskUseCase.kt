@@ -16,29 +16,18 @@ class DeleteTaskUseCase @Inject constructor(
     suspend operator fun invoke(task: AgendaItem.Task): Resource<Unit> {
         repository.deleteTask(task)
         try {
-            repository.deleteRemoteTask(task.id.toString())
+            repository.deleteRemoteTask(task.id)
         } catch (e: IOException) {
             e.printStackTrace()
-            addModifiedTask(task)
+            //todo save as modified task for later sync
 
         } catch (e: HttpException) {
             e.printStackTrace()
-            addModifiedTask(task)
+            //todo save as modified task for later sync
         }
         return Resource.Success(Unit)
 
     }
 
-    private suspend fun addModifiedTask(task: AgendaItem.Task) {
-        val modifiedTask = ModifiedTask(
-            title = task.title,
-            description = task.description,
-            startDate = task.startDate,
-            reminder = task.reminder,
-            isDone = task.isDone,
-            modificationType = ModificationType.Deleted.value,
-            id = task.id
-        )
-        repository.saveModifiedTask(modifiedTask)
-    }
+
 }

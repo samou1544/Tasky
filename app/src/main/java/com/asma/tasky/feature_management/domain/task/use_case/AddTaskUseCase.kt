@@ -26,24 +26,13 @@ class AddTaskUseCase @Inject constructor(
             else repository.updateRemoteTask(task)
         } catch (e: IOException) {
             e.printStackTrace()
-            addModifiedTask(task)
+            //todo save as modified task for later sync
         } catch (e: HttpException) {
             e.printStackTrace()
-            addModifiedTask(task)
+            //todo save as modified task for later sync
         }
         return Resource.Success(Unit)
     }
 
-    private suspend fun addModifiedTask(task: AgendaItem.Task) {
-        val modifiedTask = ModifiedTask(
-            title = task.title,
-            description = task.description,
-            startDate = task.startDate,
-            reminder = task.reminder,
-            isDone = task.isDone,
-            modificationType = ModificationType.Created.value,
-            id = task.id
-        )
-        repository.saveModifiedTask(modifiedTask)
-    }
+
 }
