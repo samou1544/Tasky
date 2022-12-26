@@ -10,67 +10,33 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.asma.tasky.core.domain.util.Util
 import com.asma.tasky.core.presentation.ui.theme.*
 import com.asma.tasky.feature_management.domain.event.model.Attendee
-import com.asma.tasky.feature_management.presentation.event.Attendees
+import com.asma.tasky.feature_management.presentation.event.AttendeesStatus
 
-@Preview
 @Composable
-fun Visitors() {
-    val goingAttendees = listOf(
-        Attendee(
-            name = "Asma Smail",
-            email = "",
-            isCreator = false
-        ),
-        Attendee(
-            name = "Mohamed Smail",
-            email = "",
-            isCreator = true
-        ),
-        Attendee(
-            name = "Mona Smail",
-            email = "",
-            isCreator = false
-        ),
-    )
+fun Visitors(
+    selected: AttendeesStatus,
+    onAddAttendee: () -> Unit,
+    onChangeStatus: (AttendeesStatus) -> Unit,
+    goingAttendees: List<Attendee>,
+    notGoingAttendees: List<Attendee>,
+    editable: Boolean,
+    onRemoveAttendee: (Attendee) -> Unit
+) {
+    val list = listOf(AttendeesStatus.All, AttendeesStatus.Going, AttendeesStatus.NotGoing)
 
-    val notGoingAttendees = listOf(
-        Attendee(
-            name = "Asma Smail",
-            email = "",
-            isCreator = false
-        ),
-        Attendee(
-            name = "Mohamed Smail",
-            email = "",
-            isCreator = true
-        ),
-        Attendee(
-            name = "Mona Smail",
-            email = "",
-            isCreator = false
-        ),
-    )
-
-
-    val list = listOf(Attendees.All, Attendees.Going, Attendees.NotGoing)
-    var selected by remember {
-        mutableStateOf(list[2])
-    }
     Column(
         modifier = Modifier
             .background(color = Color.White)
@@ -89,7 +55,10 @@ fun Visitors() {
             Box(
                 modifier = Modifier
                     .size(35.dp)
-                    .background(shape = RoundedCornerShape(5.dp), color = LightGray),
+                    .background(shape = RoundedCornerShape(5.dp), color = LightGray)
+                    .clickable {
+                        onAddAttendee()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -117,7 +86,7 @@ fun Visitors() {
                         )
                         .padding(vertical = SpaceSmall)
                         .clickable {
-                            selected = it
+                            onChangeStatus(it)
                         },
                     textAlign = TextAlign.Center,
                     color = if (selected == it) Color.White else Color.Black
@@ -128,7 +97,7 @@ fun Visitors() {
         }
 
         when (selected) {
-            is Attendees.All -> {
+            is AttendeesStatus.All -> {
                 if (goingAttendees.isNotEmpty())
                     Column(
                         modifier = Modifier
@@ -140,7 +109,11 @@ fun Visitors() {
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
-                        AttendeesList(attendees = goingAttendees)
+                        AttendeesList(
+                            attendees = goingAttendees,
+                            editable = editable,
+                            onRemoveAttendee = onRemoveAttendee
+                        )
                     }
                 if (notGoingAttendees.isNotEmpty())
                     Column(
@@ -153,26 +126,38 @@ fun Visitors() {
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
-                        AttendeesList(attendees = notGoingAttendees)
+                        AttendeesList(
+                            attendees = notGoingAttendees,
+                            editable = editable,
+                            onRemoveAttendee = onRemoveAttendee
+                        )
                     }
 
             }
-            is Attendees.Going -> {
+            is AttendeesStatus.Going -> {
                 Column(
                     modifier = Modifier
                         .padding(horizontal = SpaceMedium)
                 ) {
                     Spacer(modifier = Modifier.height(SpaceMedium))
-                    AttendeesList(attendees = goingAttendees)
+                    AttendeesList(
+                        attendees = goingAttendees,
+                        editable = editable,
+                        onRemoveAttendee = onRemoveAttendee
+                    )
                 }
             }
-            is Attendees.NotGoing -> {
+            is AttendeesStatus.NotGoing -> {
                 Column(
                     modifier = Modifier
                         .padding(horizontal = SpaceMedium)
                 ) {
                     Spacer(modifier = Modifier.height(SpaceMedium))
-                    AttendeesList(attendees = notGoingAttendees)
+                    AttendeesList(
+                        attendees = notGoingAttendees,
+                        editable = editable,
+                        onRemoveAttendee = onRemoveAttendee
+                    )
                 }
             }
         }
@@ -180,11 +165,15 @@ fun Visitors() {
 }
 
 @Composable
-fun AttendeesList(attendees: List<Attendee>) {
+fun AttendeesList(
+    attendees: List<Attendee>,
+    editable: Boolean,
+    onRemoveAttendee: (Attendee) -> Unit
+) {
     Column {
         Spacer(modifier = Modifier.height(SpaceSmall))
         attendees.forEach { attendee ->
-            AttendeesRow(attendee)
+            AttendeesRow(attendee, editable, onRemoveAttendee = onRemoveAttendee)
             Spacer(modifier = Modifier.height(SpaceSmall))
         }
     }
@@ -193,7 +182,7 @@ fun AttendeesList(attendees: List<Attendee>) {
 }
 
 @Composable
-fun AttendeesRow(attendee: Attendee, editable: Boolean = false) {
+fun AttendeesRow(attendee: Attendee, editable: Boolean, onRemoveAttendee: (Attendee) -> Unit) {
 
     Row(
         modifier = Modifier
@@ -240,7 +229,9 @@ fun AttendeesRow(attendee: Attendee, editable: Boolean = false) {
             )
         else
             if (editable)
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    onRemoveAttendee(attendee)
+                }) {
                     Icon(
                         imageVector = Icons.Default.DeleteOutline,
                         contentDescription = "Delete Attendee",

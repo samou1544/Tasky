@@ -49,5 +49,12 @@
     <string name="delete">Delete</string>
     <string name="Photo">Photo</string>
     <string name="delete_event">DELETE EVENT</string>
+    <string name="new_event">New Event</string>
+    <string name="event">Event</string>
+    <string name="event_description">Event description</string>
+    <string name="from">from</string>
+    <string name="to">to</string>
+    <string name="user_not_found">No user associated with this email found</string>
+    <string name="invalid_event">Invalid Event</string>
 
 </resources>

@@ -11,5 +11,5 @@ data class ModifiedTask(
     val reminder: Long,
     val isDone: Boolean,
     val modificationType: String,
-    @PrimaryKey var id: Int,
+    @PrimaryKey var id: String,
 )

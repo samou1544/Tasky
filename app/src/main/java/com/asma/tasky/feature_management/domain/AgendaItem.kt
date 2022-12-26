@@ -1,11 +1,13 @@
 package com.asma.tasky.feature_management.domain
 
 import android.os.Parcelable
+import com.asma.tasky.feature_management.domain.event.model.Attendee
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 
 sealed class AgendaItem(
-    val id: Int,
+    val id: String,
     val title: String,
     val description: String?,
     val startDate: Long,
@@ -17,7 +19,7 @@ sealed class AgendaItem(
         val taskStartDate: Long = System.currentTimeMillis(),
         val taskReminder: Long = System.currentTimeMillis(),
         val isDone: Boolean = false,
-        var taskId: Int = 0
+        var taskId: String = UUID.randomUUID().toString()
     ) : AgendaItem(
         id = taskId,
         title = taskTitle,
@@ -28,11 +30,14 @@ sealed class AgendaItem(
 
     @Parcelize  data class Event(
          val eventTitle: String = "",
-         val eventDescription: String = "",
+         val eventDescription: String? = null,
          val eventStartDate: Long = System.currentTimeMillis(),
         val eventEndDate: Long = System.currentTimeMillis(),
          val eventReminder: Long = System.currentTimeMillis(),
-         var eventId: Int = 0
+         val eventId: String = UUID.randomUUID().toString(),
+         val eventCreator:String = "",
+         val photos:List<String> = emptyList(),
+         val attendees:List<Attendee> = emptyList()
     ) : AgendaItem(
         id = eventId,
         title = eventTitle,
@@ -46,7 +51,7 @@ sealed class AgendaItem(
          val reminderDescription: String = "",
          val reminderStartDate: Long = System.currentTimeMillis(),
          val reminderReminder: Long = System.currentTimeMillis(),
-         var reminderId: Int = 0
+         var reminderId: String = UUID.randomUUID().toString()
     ) : AgendaItem(
         id = reminderId,
         title = reminderTitle,

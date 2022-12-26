@@ -1,5 +1,6 @@
 package com.asma.tasky.feature_management.presentation.event
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -24,14 +25,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import com.asma.tasky.R
-import com.asma.tasky.core.presentation.ui.theme.Green
-import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
-import com.asma.tasky.core.presentation.ui.theme.SpaceMedium
-import com.asma.tasky.core.presentation.ui.theme.SpaceSmall
+import com.asma.tasky.core.presentation.ui.theme.*
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.asString
 import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.presentation.components.*
+import com.asma.tasky.feature_management.presentation.event.components.AddAttendeeDialog
 import com.asma.tasky.feature_management.presentation.event.components.AddPhotos
 import com.asma.tasky.feature_management.presentation.event.components.Visitors
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -39,6 +38,7 @@ import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.flow.collectLatest
+import java.io.File
 
 @Composable
 fun EventScreen(
@@ -54,32 +54,29 @@ fun EventScreen(
     viewModel: EventViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val timeDialogState = rememberMaterialDialogState()
-    val dateDialogState = rememberMaterialDialogState()
+    val startTimeDialogState = rememberMaterialDialogState()
+    val endTimeDialogState = rememberMaterialDialogState()
+
+    val startDateDialogState = rememberMaterialDialogState()
+    val endDateDialogState = rememberMaterialDialogState()
+
     val scrollState = rememberScrollState()
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
-            viewModel.onEvent(EventEvent.PhotosAdded(uriList.map {
-                it.toString()
-            }))
+            viewModel.onEvent(EventEvent.PhotosAdded(uriList))
         }
-    val photos by viewModel.eventPhotos.collectAsState()
-    val eventState by viewModel.eventState.collectAsState()
-    val taskTime by viewModel.eventTime.collectAsState()
-    val reminder by viewModel.eventReminder.collectAsState()
-    val goingAttendees by remember {
-        derivedStateOf {
-            eventState.attendees.filter { attendee ->
-                attendee.isGoing
-            }
+    val state by viewModel.eventState.collectAsState()
+
+
+    val goingAttendees = remember(state.event.attendees) {
+        state.event.attendees.filter { attendee ->
+            attendee.isGoing
         }
     }
 
-    val notGoingAttendees by remember {
-        derivedStateOf {
-            eventState.attendees.filter { attendee ->
-                !attendee.isGoing
-            }
+    val notGoingAttendees = remember(state.event.attendees) {
+        state.event.attendees.filter { attendee ->
+            !attendee.isGoing
         }
     }
 
@@ -89,7 +86,7 @@ fun EventScreen(
             viewModel.onEvent(EventEvent.TitleEntered(it))
         }
         deletedImageUrl?.let {
-            viewModel.onEvent(EventEvent.PhotoDeleted(it))
+            viewModel.onEvent(EventEvent.PhotoDeleted(Uri.parse(it)))
         }
         description?.let {
             viewModel.onEvent(EventEvent.DescriptionEntered(it))
@@ -133,12 +130,12 @@ fun EventScreen(
                 )
             }
             Text(
-                text = DateUtil.formatDate(taskTime, "dd MMMM yyyy"),
+                text = DateUtil.formatDate(state.startTime, "dd MMMM yyyy"),
                 color = Color.White,
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold
             )
-            if (eventState.isEditable) {
+            if (state.isEditable) {
                 Row {
                     Text(
                         modifier = Modifier
@@ -152,7 +149,7 @@ fun EventScreen(
                         style = MaterialTheme.typography.body1,
                         fontWeight = FontWeight.Normal
                     )
-                    if (eventState.isLoading) {
+                    if (state.isLoading) {
                         Spacer(modifier = Modifier.width(SpaceSmall))
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
                     }
@@ -191,10 +188,10 @@ fun EventScreen(
                     Box(
                         modifier = Modifier
                             .size(20.dp)
-                            .background(color = Green, shape = RoundedCornerShape(2.dp))
+                            .background(color = LightGreen, shape = RoundedCornerShape(2.dp))
                     )
                     Text(
-                        text = stringResource(R.string.task),
+                        text = stringResource(R.string.event),
                         modifier = Modifier.padding(start = SpaceSmall),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp,
@@ -204,8 +201,8 @@ fun EventScreen(
 
                 // title
                 Title(
-                    title = eventState.event.title.ifEmpty { stringResource(id = R.string.new_task) },
-                    editable = eventState.isEditable,
+                    title = state.event.title.ifEmpty { stringResource(id = R.string.new_event) },
+                    editable = state.isEditable,
                     onClick = onEditTitle
                 )
                 Divider(
@@ -218,13 +215,13 @@ fun EventScreen(
                 // description
                 Description(
                     description =
-                    if (eventState.event.description.isNullOrEmpty()) stringResource(id = R.string.task_description)
-                    else eventState.event.description!!,
-                    editable = eventState.isEditable,
+                    if (state.event.description.isNullOrEmpty()) stringResource(id = R.string.event_description)
+                    else state.event.description!!,
+                    editable = state.isEditable,
                     onClick = onEditDescription
                 )
                 AddPhotos(
-                    photos = photos,
+                    photos = state.photos,
                     imageLoader = imageLoader,
                     onClick = {
                         galleryLauncher.launch("image/*")
@@ -240,17 +237,36 @@ fun EventScreen(
                     thickness = 1.dp, color = Color.LightGray
                 )
 
-                // time
+
                 Spacer(modifier = Modifier.height(SpaceMedium))
+                // start time
                 TimeSelector(
-                    label = stringResource(R.string.at),
-                    startDateTime = taskTime,
-                    editable = eventState.isEditable,
+                    label = stringResource(R.string.from),
+                    startDateTime = state.startTime,
+                    editable = state.isEditable,
                     onEditDate = {
-                        dateDialogState.show()
+                        startDateDialogState.show()
                     },
                     onEditTime = {
-                        timeDialogState.show()
+                        startTimeDialogState.show()
+                    }
+                )
+                Divider(
+                    modifier = Modifier.padding(
+                        horizontal = SpaceMedium
+                    ),
+                    thickness = 1.dp, color = Color.LightGray
+                )
+                // end time
+                TimeSelector(
+                    label = stringResource(R.string.to),
+                    startDateTime = state.endTime,
+                    editable = state.isEditable,
+                    onEditDate = {
+                        endDateDialogState.show()
+                    },
+                    onEditTime = {
+                        endTimeDialogState.show()
                     }
                 )
                 Divider(
@@ -263,14 +279,14 @@ fun EventScreen(
                 // Reminder
                 Box {
                     ReminderSelector(
-                        reminder = reminder,
-                        editable = eventState.isEditable,
+                        reminder = state.reminder,
+                        editable = state.isEditable,
                         onClick = {
                             viewModel.onEvent(EventEvent.ToggleReminderDropDown)
                         }
                     )
                     ReminderDropDown(
-                        expanded = eventState.showReminderDropDown,
+                        expanded = state.showReminderDropDown,
                         onDismiss = {
                             viewModel.onEvent(EventEvent.ToggleReminderDropDown)
                         },
@@ -285,40 +301,98 @@ fun EventScreen(
                     thickness = 1.dp, color = Color.LightGray
                 )
 
-                Visitors()
+                Visitors(
+                    selected = state.selectedAttendeeStatus,
+                    goingAttendees = goingAttendees,
+                    notGoingAttendees = notGoingAttendees,
+                    onChangeStatus = {
+                        viewModel.onEvent(EventEvent.ChangeStatus(it))
+                    },
+                    onAddAttendee = {
+                        viewModel.onEvent(EventEvent.ToggleShowAddAttendeeDialog)
+                    },
+                    editable = state.isEditable,
+                    onRemoveAttendee = {
+                        viewModel.onEvent(EventEvent.AttendeeRemoved(it))
+                    }
+                )
+                Spacer(modifier = Modifier.weight(1f))
 
+                if (state.showDeleteEvent)
                 // Delete
-                //todo show delete ownly if I am the creator of the event
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-                    DeleteText(
-                        text = stringResource(R.string.delete_event),
-                        onDelete = { viewModel.onEvent(EventEvent.Delete) }
-                    )
-                }
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        DeleteText(
+                            text = stringResource(R.string.delete_event),
+                            onDelete = { viewModel.onEvent(EventEvent.Delete) }
+                        )
+                    }
             }
 
             MaterialDialog(
-                dialogState = timeDialogState,
+                dialogState = startTimeDialogState,
                 buttons = {
                     positiveButton(stringResource(R.string.dialog_ok))
                     negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                timepicker(initialTime = taskTime.toLocalTime()) {
-                    viewModel.onEvent(EventEvent.TimeSelected(it))
+                timepicker(initialTime = state.startTime.toLocalTime()) {
+                    viewModel.onEvent(EventEvent.StartTimeSelected(it))
                 }
             }
 
             MaterialDialog(
-                dialogState = dateDialogState,
+                dialogState = startDateDialogState,
                 buttons = {
                     positiveButton(stringResource(R.string.dialog_ok))
                     negativeButton(stringResource(R.string.dialog_cancel))
                 }
             ) {
-                datepicker(initialDate = taskTime.toLocalDate()) { date ->
-                    viewModel.onEvent(EventEvent.DateSelected(date))
+                datepicker(initialDate = state.startTime.toLocalDate()) { date ->
+                    viewModel.onEvent(EventEvent.StartDateSelected(date))
                 }
+            }
+
+            MaterialDialog(
+                dialogState = endTimeDialogState,
+                buttons = {
+                    positiveButton(stringResource(R.string.dialog_ok))
+                    negativeButton(stringResource(R.string.dialog_cancel))
+                }
+            ) {
+                timepicker(initialTime = state.endTime.toLocalTime()) {
+                    viewModel.onEvent(EventEvent.EndTimeSelected(it))
+                }
+            }
+
+            MaterialDialog(
+                dialogState = endDateDialogState,
+                buttons = {
+                    positiveButton(stringResource(R.string.dialog_ok))
+                    negativeButton(stringResource(R.string.dialog_cancel))
+                }
+            ) {
+                datepicker(initialDate = state.endTime.toLocalDate()) { date ->
+                    viewModel.onEvent(EventEvent.EndDateSelected(date))
+                }
+            }
+
+            if (state.showAddAttendeeDialog) {
+                AddAttendeeDialog(
+                    onCancel = { viewModel.onEvent(EventEvent.ToggleShowAddAttendeeDialog) },
+                    attendeeEmail = state.attendeeEmail.text,
+                    isEmailValid = state.isAttendeeEmailValid,
+                    error = state.attendeeEmail.error,
+                    onAttendeeEntered = {
+                        viewModel.onEvent(EventEvent.AttendeeEmailEntered(it))
+                    },
+                    onAttendeeAdded = {
+                        viewModel.onEvent(EventEvent.AttendeeEmailAdded(it))
+                    },
+                    isLoading = state.isCheckingAttendeeEmail
+                )
             }
         }
     }

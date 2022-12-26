@@ -17,7 +17,7 @@ data class TaskDTO(
             taskStartDate = time,
             taskReminder = remindAt,
             isDone = isDone,
-            taskId = id.toInt()
+            taskId = id
         )
     }
 }

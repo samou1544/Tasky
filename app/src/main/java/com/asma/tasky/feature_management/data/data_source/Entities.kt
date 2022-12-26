@@ -10,7 +10,7 @@ data class TaskEntity(
     val startDate: Long,
     val reminder: Long,
     val isDone: Boolean,
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    @PrimaryKey val id: String,
 )
 
 @Entity
@@ -20,7 +20,7 @@ data class EventEntity(
     val startDate: Long,
     val endDate: Long,
     val reminder: Long,
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    @PrimaryKey val id: String
 )
 
 @Entity
@@ -29,5 +29,5 @@ data class ReminderEntity(
     val description: String,
     val startDate: Long,
     val reminder: Long,
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    @PrimaryKey val id: String
 )

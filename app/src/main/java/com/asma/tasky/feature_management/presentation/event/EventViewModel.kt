@@ -1,36 +1,41 @@
 package com.asma.tasky.feature_management.presentation.event
 
+import android.content.ContentResolver
+import android.net.Uri
+import androidx.core.content.FileProvider.getUriForFile
+import androidx.core.net.toFile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.asma.tasky.core.domain.states.TextFieldState
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.Constants
+import com.asma.tasky.core.util.Resource
+import com.asma.tasky.feature_authentication.domain.util.Validation
 import com.asma.tasky.feature_management.domain.AgendaItem
-import com.asma.tasky.feature_management.domain.task.use_case.AddTaskUseCase
-import com.asma.tasky.feature_management.domain.task.use_case.DeleteTaskUseCase
-import com.asma.tasky.feature_management.domain.task.use_case.GetTaskUseCase
+import com.asma.tasky.feature_management.domain.event.use_case.CreateEventUseCase
+import com.asma.tasky.feature_management.domain.event.use_case.GetAttendeeUseCase
 import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.domain.util.Reminder
+import com.asma.tasky.feature_management.domain.util.ReminderUtil
+import com.asma.tasky.feature_management.presentation.event.util.AttendeeError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
-   savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val getAttendeeUseCase: GetAttendeeUseCase,
+    private val createEventUseCase: CreateEventUseCase
 ) : ViewModel() {
 
-    private val _eventPhotos = MutableStateFlow<List<String>>(emptyList())
-    val eventPhotos = _eventPhotos.asStateFlow()
-
+    private val currentUserId = ""
     private val _eventState = MutableStateFlow(EventState())
     val eventState = _eventState.asStateFlow()
-
-    private val _eventTime = MutableStateFlow(LocalDateTime.now())
-    val eventTime = _eventTime.asStateFlow()
-
-    private val _eventReminder = MutableStateFlow<Reminder>(Reminder.OneHourBefore)
-    val eventReminder = _eventReminder.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -58,16 +63,21 @@ class EventViewModel @Inject constructor(
         _eventState.update {
             it.copy(event = event)
         }
-        _eventState.update {
-            it.copy(showDeleteEvent = true)
-        }
+        if (event.eventCreator == currentUserId)
+            _eventState.update {
+                it.copy(showDeleteEvent = true)
+            }
         event.startDate.let { time ->
-            _eventTime.update { DateUtil.secondsToLocalDateTime(time) }
+            _eventState.update {
+                it.copy(startTime = DateUtil.secondsToLocalDateTime(time))
+            }
         }
-        _eventReminder.update {
-            computeReminder(
-                startTime = event.startDate,
-                reminderTime = event.reminder
+        _eventState.update {
+            it.copy(
+                reminder = ReminderUtil.computeReminder(
+                    startTime = event.startDate,
+                    reminderTime = event.reminder
+                )
             )
         }
     }
@@ -75,13 +85,13 @@ class EventViewModel @Inject constructor(
     fun onEvent(event: EventEvent) {
         when (event) {
             is EventEvent.PhotosAdded -> {
-                _eventPhotos.update {
-                    it + event.uriList
+                _eventState.update {
+                    it.copy(photos = it.photos + event.uriList)
                 }
             }
             is EventEvent.PhotoDeleted -> {
-                _eventPhotos.update {
-                    it.minus(event.uri)
+                _eventState.update {
+                    it.copy(photos = it.photos.minus(event.uri))
                 }
 
             }
@@ -95,27 +105,20 @@ class EventViewModel @Inject constructor(
                     it.copy(event = it.event.copy(eventDescription = event.description))
                 }
             }
-            is EventEvent.TimeSelected -> {
-                _eventTime.update {
-                    it.with(event.time)
-                }
-            }
-            is EventEvent.DateSelected -> {
-                _eventTime.update {
-                    it.with(event.date)
-                }
-            }
             is EventEvent.ReminderSelected -> {
-                _eventReminder.update {
-                    event.reminder
+                _eventState.update {
+                    it.copy(reminder = event.reminder)
                 }
             }
             is EventEvent.Save -> {
                 _eventState.update {
                     it.copy(isLoading = true)
                 }
+                //todo save event to remote
+                createEvent()
             }
             is EventEvent.Delete -> {
+                //todo delete event
             }
             is EventEvent.ToggleReminderDropDown -> {
                 _eventState.update {
@@ -127,6 +130,56 @@ class EventViewModel @Inject constructor(
                     it.copy(isEditable = it.isEditable.not())
                 }
             }
+            is EventEvent.StartTimeSelected -> {
+                _eventState.update {
+                    it.copy(startTime = it.startTime.with(event.time))
+                }
+            }
+            is EventEvent.StartDateSelected -> {
+                _eventState.update {
+                    it.copy(startTime = it.startTime.with(event.date))
+                }
+            }
+            is EventEvent.EndTimeSelected -> {
+                _eventState.update {
+                    it.copy(endTime = it.endTime.with(event.time))
+                }
+            }
+            is EventEvent.EndDateSelected -> {
+                _eventState.update {
+                    it.copy(endTime = it.endTime.with(event.date))
+                }
+            }
+            is EventEvent.ChangeStatus -> {
+                _eventState.update {
+                    it.copy(selectedAttendeeStatus = event.status)
+                }
+            }
+            is EventEvent.ToggleShowAddAttendeeDialog -> {
+                _eventState.update {
+                    it.copy(showAddAttendeeDialog = it.showAddAttendeeDialog.not())
+                }
+                resetAttendeeDialogState()
+            }
+            is EventEvent.AttendeeEmailEntered -> {
+                _eventState.update {
+                    it.copy(attendeeEmail = TextFieldState(text = event.email))
+                }
+                validateAttendeeEmail(event.email)
+            }
+            is EventEvent.AttendeeEmailAdded -> {
+                _eventState.update {
+                    it.copy(isCheckingAttendeeEmail = true)
+                }
+                getAttendee(event.email)
+            }
+            is EventEvent.AttendeeRemoved -> {
+                _eventState.update { state ->
+                    state.copy(
+                        event = state.event.copy(attendees = state.event.attendees - event.attendee)
+                    )
+                }
+            }
         }
     }
 
@@ -134,26 +187,66 @@ class EventViewModel @Inject constructor(
         return DateUtil.localDateTimeToSeconds(startTime) - reminder.seconds
     }
 
-    private fun computeReminder(reminderTime: Long, startTime: Long): Reminder {
-        return when (startTime - reminderTime) {
-            Reminder.OneHourBefore.seconds -> {
-                Reminder.OneHourBefore
+    private fun validateAttendeeEmail(email: String) {
+        val emailError = Validation.validateEmail(email)
+        _eventState.update {
+            it.copy(
+                attendeeEmail = it.attendeeEmail.copy(error = emailError),
+                isAttendeeEmailValid = emailError == null
+            )
+        }
+    }
+
+    private fun getAttendee(email: String) {
+        viewModelScope.launch {
+            when (val result = getAttendeeUseCase(email)) {
+                is Resource.Success -> {
+                    _eventState.update { state ->
+                        state.copy(
+                            event = state.event.copy(attendees = state.event.attendees + result.data!!)
+                        )
+                    }
+                    resetAttendeeDialogState()
+                }
+                is Resource.Error -> {
+
+                    _eventState.update {
+                        it.copy(
+                            isCheckingAttendeeEmail = false,
+                            attendeeEmail = it.attendeeEmail.copy(error = AttendeeError.NoUserFound)
+                        )
+                    }
+                }
             }
-            Reminder.OneDayBefore.seconds -> {
-                Reminder.OneDayBefore
+        }
+    }
+
+    private fun resetAttendeeDialogState() {
+        _eventState.update {
+            it.copy(
+                attendeeEmail = TextFieldState(),
+                isAttendeeEmailValid = null,
+                isCheckingAttendeeEmail = false
+            )
+        }
+    }
+
+    private fun createEvent() {
+        viewModelScope.launch {
+            when (createEventUseCase(
+                event = _eventState.value.event,
+                photos = _eventState.value.photos.map { uri ->
+                    uri.toString()
+                }))
+            {
+                is Resource.Error -> {
+
+                }
+                is Resource.Success -> {
+                    _eventFlow.emit(UiEvent.NavigateUp)
+                }
             }
-            Reminder.ThirtyMinutesBefore.seconds -> {
-                Reminder.ThirtyMinutesBefore
-            }
-            Reminder.TenMinutesBefore.seconds -> {
-                Reminder.TenMinutesBefore
-            }
-            Reminder.SixHoursBefore.seconds -> {
-                Reminder.SixHoursBefore
-            }
-            else -> {
-                Reminder.OneHourBefore
-            }
+
         }
     }
 }

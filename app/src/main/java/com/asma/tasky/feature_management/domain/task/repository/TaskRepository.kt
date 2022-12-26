@@ -7,7 +7,7 @@ interface TaskRepository {
 
     suspend fun getTaskById(id: Int): AgendaItem.Task?
 
-    suspend fun addTask(task: AgendaItem.Task): Long
+    suspend fun addTask(task: AgendaItem.Task)
 
     suspend fun deleteTask(task: AgendaItem.Task)
 

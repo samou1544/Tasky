@@ -7,23 +7,22 @@ import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
 import com.asma.tasky.feature_management.domain.util.ModificationType
+import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
-import retrofit2.HttpException
 
 class AddTaskUseCase @Inject constructor(
     private val repository: TaskRepository
 ) {
 
-    suspend operator fun invoke(task: AgendaItem.Task): Resource<Unit> {
+    suspend operator fun invoke(task: AgendaItem.Task, newTask: Boolean = true): Resource<Unit> {
         if (task.title.isBlank()) {
             return Resource.Error(message = UiText.StringResource(R.string.invalid_task))
         }
-        val rowId = repository.addTask(task)
 
         try {
-            if (task.id == 0) // newly created task
-                repository.addRemoteTask(task.copy(taskId = rowId.toInt()))
+            if (newTask) // newly created task
+                repository.addRemoteTask(task)
             else repository.updateRemoteTask(task)
         } catch (e: IOException) {
             e.printStackTrace()

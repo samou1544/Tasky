@@ -15,22 +15,22 @@ class TaskRepositoryImpl(private val dao: TaskyDao, private val api: TaskApi) : 
         return dao.getTaskById(id)?.toAgendaTask()
     }
 
-    override suspend fun addTask(task: AgendaItem.Task): Long {
-        return dao.addTask(task.toTaskEntity())
+    override suspend fun addTask(task: AgendaItem.Task) {
+         dao.addTask(task.toTaskEntity())
     }
 
     override suspend fun deleteTask(task: AgendaItem.Task) {
-        return dao.deleteTask(task.toTaskEntity())
+         dao.deleteTask(task.toTaskEntity())
     }
 
-    override suspend fun getRemoteTaskById(id: Int): AgendaItem.Task? {
+    override suspend fun getRemoteTaskById(id: Int): AgendaItem.Task {
         val response = api.getTask(id.toString())
         return response.toAgendaItem()
     }
 
     override suspend fun addRemoteTask(task: AgendaItem.Task) {
         val taskDTO = TaskDTO(
-            id = task.id.toString(),
+            id = task.id,
             title = task.title,
             description = task.description,
             time = task.startDate,
@@ -42,7 +42,7 @@ class TaskRepositoryImpl(private val dao: TaskyDao, private val api: TaskApi) : 
 
     override suspend fun updateRemoteTask(task: AgendaItem.Task) {
         val taskDTO = TaskDTO(
-            id = task.id.toString(),
+            id = task.id,
             title = task.title,
             description = task.description,
             time = task.startDate,
