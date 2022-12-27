@@ -8,5 +8,5 @@ sealed class Screen(val route: String) {
     object EventScreen : Screen("event_screen")
     object ReminderScreen : Screen("reminder_screen")
     object EditFieldScreen : Screen("edit_field_screen")
-    object EditDescriptionScreen : Screen("edit_Description_screen")
+    object PhotoDetailScreen : Screen("photo_detail_screen")
 }

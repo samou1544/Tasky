@@ -34,7 +34,7 @@ fun EditFieldScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         val title = when (key) {
-            Constants.KEY_TITLE -> stringResource(id = R.string.edit_title)
+            Constants.PARAM_TITLE -> stringResource(id = R.string.edit_title)
             Constants.KEY_DESCRIPTION -> stringResource(id = R.string.edit_description)
             else -> key
         }
@@ -51,7 +51,7 @@ fun EditFieldScreen(
                 .padding(vertical = SpaceLarge, horizontal = SpaceMedium),
             value = text.text,
             textStyle = TextStyle(
-                fontSize = if (key == Constants.KEY_TITLE) 26.sp else 16.sp,
+                fontSize = if (key == Constants.PARAM_TITLE) 26.sp else 16.sp,
                 fontWeight = FontWeight.Normal
             ),
             keyboardOptions = KeyboardOptions(

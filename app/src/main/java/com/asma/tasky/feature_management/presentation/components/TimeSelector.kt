@@ -31,14 +31,14 @@ fun TimeSelector(
     ) {
         Text(
             text = label,
-            modifier = Modifier.padding(start = SpaceSmall),
+            modifier = Modifier.weight(1f).padding(start = SpaceSmall),
             fontWeight = FontWeight.Normal,
             fontSize = 18.sp
         )
         Spacer(modifier = Modifier.width(50.dp))
         Text(
             text = DateUtil.formatDate(startDateTime, "hh:mm"),
-            modifier = Modifier
+            modifier = Modifier.weight(1f)
                 .clickable(enabled = editable) {
                     onEditTime()
                 }
@@ -49,7 +49,7 @@ fun TimeSelector(
         Spacer(modifier = Modifier.width(80.dp))
         Text(
             text = DateUtil.formatDate(startDateTime, "MMM dd yyyy"),
-            modifier = Modifier
+            modifier = Modifier.weight(2f)
                 .clickable(enabled = editable) {
                     onEditDate()
                 }

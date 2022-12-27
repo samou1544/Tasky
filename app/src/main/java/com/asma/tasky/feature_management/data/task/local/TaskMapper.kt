@@ -1,7 +1,7 @@
-package com.asma.tasky.feature_management.data.mapper
+package com.asma.tasky.feature_management.data.task.local
 
-import com.asma.tasky.feature_management.data.data_source.TaskEntity
 import com.asma.tasky.feature_management.domain.AgendaItem
+import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 
 fun TaskEntity.toAgendaTask(): AgendaItem.Task {
     return AgendaItem.Task(
@@ -22,5 +22,18 @@ fun AgendaItem.Task.toTaskEntity(): TaskEntity {
         reminder = reminder,
         isDone = isDone,
         id = id
+    )
+}
+
+
+fun ModifiedTask.toModifiedTaskEntity(): ModifiedTaskEntity {
+    return ModifiedTaskEntity(
+        title = task.title,
+        description = task.description,
+        startDate = task.startDate,
+        reminder = task.reminder,
+        isDone = task.isDone,
+        id = task.id,
+        modificationType = modificationType.value
     )
 }
