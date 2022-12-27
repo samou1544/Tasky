@@ -3,6 +3,7 @@ package com.asma.tasky.feature_management.presentation.event
 import android.net.Uri
 import com.asma.tasky.feature_management.domain.event.model.Attendee
 import com.asma.tasky.feature_management.domain.util.Reminder
+import com.asma.tasky.feature_management.presentation.event.components.AttendeesStatus
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -21,6 +22,7 @@ sealed class EventEvent {
     data class EndDateSelected(val date: LocalDate) : EventEvent()
     data class ReminderSelected(val reminder: Reminder) : EventEvent()
     data class PhotosAdded(val uriList: List<Uri>) : EventEvent()
+    data class ChangeStatus(val status: AttendeesStatus): EventEvent()
     data class PhotoDeleted(val uri: Uri) : EventEvent()
     object ToggleReminderDropDown : EventEvent()
     object ToggleShowAddAttendeeDialog : EventEvent()

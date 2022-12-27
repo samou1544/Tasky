@@ -20,10 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.asma.tasky.core.domain.util.Util
+import com.asma.tasky.core.domain.util.UserUtil
 import com.asma.tasky.core.presentation.ui.theme.*
 import com.asma.tasky.feature_management.domain.event.model.Attendee
-import com.asma.tasky.feature_management.presentation.event.AttendeesStatus
 
 @Composable
 fun Visitors(
@@ -196,7 +195,7 @@ fun AttendeesRow(attendee: Attendee, editable: Boolean, onRemoveAttendee: (Atten
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = Util.getInitials(attendee.fullName),
+                    text = UserUtil.getInitials(attendee.fullName),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
                     color = Color.White
@@ -231,4 +230,10 @@ fun AttendeesRow(attendee: Attendee, editable: Boolean, onRemoveAttendee: (Atten
                 )
             }
     }
+}
+
+sealed class AttendeesStatus(val value: String) {
+    object All : AttendeesStatus("All")
+    object Going : AttendeesStatus("Going")
+    object NotGoing : AttendeesStatus("Not going")
 }

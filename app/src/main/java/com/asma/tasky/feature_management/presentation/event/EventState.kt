@@ -4,6 +4,7 @@ import android.net.Uri
 import com.asma.tasky.core.domain.states.TextFieldState
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.util.Reminder
+import com.asma.tasky.feature_management.presentation.event.components.AttendeesStatus
 import java.time.LocalDateTime
 
 data class EventState(

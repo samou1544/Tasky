@@ -3,13 +3,15 @@ package com.asma.tasky.feature_management.data.event
 import android.content.ContentResolver
 import android.net.Uri
 import com.asma.tasky.feature_management.data.event.local.EventDao
+import com.asma.tasky.feature_management.data.event.local.toEventEntity
+import com.asma.tasky.feature_management.data.event.local.toModifiedEventEntity
 import com.asma.tasky.feature_management.data.event.remote.CreateEventRequest
 import com.asma.tasky.feature_management.data.event.remote.EventApi
 import com.asma.tasky.feature_management.data.event.remote.toAttendee
 import com.asma.tasky.feature_management.data.event.util.ContentUriRequestBody
-import com.asma.tasky.feature_management.data.event.local.toEventEntity
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.event.model.Attendee
+import com.asma.tasky.feature_management.domain.event.model.ModifiedEvent
 import com.asma.tasky.feature_management.domain.event.repository.EventRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +23,7 @@ class EventRepositoryImpl(
     private val api: EventApi,
     private val contentResolver: ContentResolver,
     private val eventUploader: EventUploader,
-    private val dao:EventDao
+    private val dao: EventDao
 ) : EventRepository {
     override suspend fun getAttendee(email: String): Attendee {
         return api.getAttendee(email).toAttendee()
@@ -92,12 +94,14 @@ class EventRepositoryImpl(
             result
         }
     }
+
     override suspend fun updateRemoteEvent(
         event: AgendaItem.Event,
         photos: List<String>
     ): AgendaItem.Event {
         TODO("Not yet implemented")
     }
+
     override suspend fun insertEvent(event: AgendaItem.Event) {
         dao.addEvent(event.toEventEntity())
     }
