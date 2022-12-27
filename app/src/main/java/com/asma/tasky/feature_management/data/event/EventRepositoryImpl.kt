@@ -2,10 +2,12 @@ package com.asma.tasky.feature_management.data.event
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.provider.OpenableColumns
+import com.asma.tasky.feature_management.data.event.local.EventDao
 import com.asma.tasky.feature_management.data.event.remote.CreateEventRequest
 import com.asma.tasky.feature_management.data.event.remote.EventApi
 import com.asma.tasky.feature_management.data.event.remote.toAttendee
+import com.asma.tasky.feature_management.data.event.util.ContentUriRequestBody
+import com.asma.tasky.feature_management.data.event.local.toEventEntity
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.event.model.Attendee
 import com.asma.tasky.feature_management.domain.event.repository.EventRepository
@@ -13,18 +15,14 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import okio.BufferedSink
-import okio.source
-import java.io.FileNotFoundException
-import java.io.IOException
 
-class EventRepositoryImpl(private val api: EventApi, private val contentResolver: ContentResolver) :
-    EventRepository {
-
+class EventRepositoryImpl(
+    private val api: EventApi,
+    private val contentResolver: ContentResolver,
+    private val eventUploader: EventUploader,
+    private val dao:EventDao
+) : EventRepository {
     override suspend fun getAttendee(email: String): Attendee {
         return api.getAttendee(email).toAttendee()
     }
@@ -33,6 +31,8 @@ class EventRepositoryImpl(private val api: EventApi, private val contentResolver
         event: AgendaItem.Event,
         photos: List<String>
     ): AgendaItem.Event = coroutineScope {
+
+        //event uploader should start the eventUpload worker
 
         val request = CreateEventRequest(
             id = event.eventId,
@@ -45,6 +45,8 @@ class EventRepositoryImpl(private val api: EventApi, private val contentResolver
                 it.userId
             }
         )
+
+        eventUploader.startEventWorker(Gson().toJson(request), type = "create")
 
 
         val parts: List<MultipartBody.Part> = photos.map {
@@ -67,7 +69,7 @@ class EventRepositoryImpl(private val api: EventApi, private val contentResolver
                 eventPhotos = parts
 
             )
-            val event = AgendaItem.Event(
+            val result = AgendaItem.Event(
                 eventTitle = response.title,
                 eventId = response.id,
                 eventReminder = response.remindAt,
@@ -75,12 +77,10 @@ class EventRepositoryImpl(private val api: EventApi, private val contentResolver
                 eventEndDate = response.to,
                 eventDescription = response.description,
                 eventCreator = response.host,
-                photos = response.photos.map {
-                    it.url
-                },
+                photos = response.photos,
                 attendees = response.attendees.map {
                     Attendee(
-                        name = it.fullName,
+                        fullName = it.fullName,
                         email = it.email,
                         isCreator = it.userId == response.host,
                         isGoing = it.isGoing,
@@ -89,67 +89,11 @@ class EventRepositoryImpl(private val api: EventApi, private val contentResolver
                     )
                 }
             )
-            event
+            result
         }
     }
-}
 
-
-class ContentUriRequestBody(
-    private val contentResolver: ContentResolver,
-    private val contentUri: Uri
-) : RequestBody() {
-
-    override fun contentType(): MediaType? {
-        val contentType = contentResolver.getType(contentUri)
-        return contentType?.toMediaTypeOrNull()
-    }
-
-    override fun contentLength(): Long {
-        val size = contentUri.length(contentResolver)
-        return size
-    }
-
-    override fun writeTo(bufferedSink: BufferedSink) {
-        val inputStream = contentResolver.openInputStream(contentUri)
-            ?: throw IOException("Couldn't open content URI for reading")
-        inputStream.source().use { source ->
-            bufferedSink.writeAll(source)
-        }
-    }
-}
-
-fun Uri.length(contentResolver: ContentResolver)
-        : Long {
-
-    val assetFileDescriptor = try {
-        contentResolver.openAssetFileDescriptor(this, "r")
-    } catch (e: FileNotFoundException) {
-        null
-    }
-    // uses ParcelFileDescriptor#getStatSize underneath if failed
-    val length = assetFileDescriptor?.use { it.length } ?: -1L
-    if (length != -1L) {
-        return length
-    }
-
-    // if "content://" uri scheme, try contentResolver table
-    if (scheme.equals(ContentResolver.SCHEME_CONTENT)) {
-        return contentResolver.query(this, arrayOf(OpenableColumns.SIZE), null, null, null)
-            ?.use { cursor ->
-                // maybe shouldn't trust ContentResolver for size: https://stackoverflow.com/questions/48302972/content-resolver-returns-wrong-size
-                val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-                if (sizeIndex == -1) {
-                    return@use -1L
-                }
-                cursor.moveToFirst()
-                return try {
-                    cursor.getLong(sizeIndex)
-                } catch (_: Throwable) {
-                    -1L
-                }
-            } ?: -1L
-    } else {
-        return -1L
+    override suspend fun insertEvent(event: AgendaItem.Event) {
+        dao.addEvent(event.toEventEntity())
     }
 }

@@ -1,36 +1,37 @@
 package com.asma.tasky.di
 
 import com.asma.tasky.feature_management.data.data_source.TaskyDatabase
-import com.asma.tasky.feature_management.data.task.remote.TaskApi
-import com.asma.tasky.feature_management.data.task.TaskRepositoryImpl
-import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
+import com.asma.tasky.feature_management.data.reminder.ReminderRepositoryImpl
+import com.asma.tasky.feature_management.data.reminder.remote.ReminderApi
+import com.asma.tasky.feature_management.domain.reminder.repository.ReminderRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object TaskModule {
+object ReminderModule {
 
     @Provides
     @Singleton
-    fun provideTaskApi(client: OkHttpClient): TaskApi {
+    fun provideReminderApi(client: OkHttpClient): ReminderApi {
         return Retrofit.Builder()
-            .baseUrl(TaskApi.BASE_URL)
+            .baseUrl(ReminderApi.BASE_URL)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
-            .create(TaskApi::class.java)
+            .create(ReminderApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideTaskRepository(db: TaskyDatabase, api: TaskApi): TaskRepository {
-        return TaskRepositoryImpl(db.taskyDao, api)
+    fun provideReminderRepository(db: TaskyDatabase, api: ReminderApi): ReminderRepository {
+        return ReminderRepositoryImpl(db.reminderDao, api)
     }
+
 }

@@ -20,4 +20,7 @@ interface TaskRepository {
     suspend fun deleteRemoteTask(taskId: String)
 
     suspend fun saveModifiedTask(modifiedTask: ModifiedTask)
+
+    suspend fun deleteModifiedTask(modifiedTask: ModifiedTask)
+
 }

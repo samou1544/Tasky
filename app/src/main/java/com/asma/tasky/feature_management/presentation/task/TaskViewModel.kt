@@ -3,7 +3,6 @@ package com.asma.tasky.feature_management.presentation.task
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.asma.tasky.feature_management.domain.reminder.ReminderManager
 import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.Constants
 import com.asma.tasky.core.util.Resource
@@ -24,7 +23,6 @@ import javax.inject.Inject
 class TaskViewModel @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
-    private val reminderManager: ReminderManager,
     getTaskUseCase: GetTaskUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -34,6 +32,8 @@ class TaskViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    private var isNewTask: Boolean = false
 
     init {
         savedStateHandle.get<Boolean>(Constants.PARAM_EDITABLE)?.let { editable ->
@@ -56,7 +56,9 @@ class TaskViewModel @Inject constructor(
                 }
             }
         } else {
-            // this is a new task, turn on editable mode
+            // this is a new task,
+            isNewTask = true
+            // turn on editable mode
             _taskState.update {
                 it.copy(isEditable = true)
             }
@@ -129,10 +131,9 @@ class TaskViewModel @Inject constructor(
                 )
 
                 viewModelScope.launch {
-                    when (val result = addTaskUseCase(task)) {
+                    when (val result = addTaskUseCase(task = task, isNewTask = isNewTask)) {
                         is Resource.Success -> {
-                            reminderManager.startReminderWorker(agendaItem = task)
-                            // todo push data to server
+                            //todo set alarm
                             _eventFlow.emit(UiEvent.NavigateUp)
                         }
                         is Resource.Error -> {
@@ -152,8 +153,7 @@ class TaskViewModel @Inject constructor(
                 viewModelScope.launch {
                     when (val result = deleteTaskUseCase(_taskState.value.task)) {
                         is Resource.Success -> {
-                            // todo remove task from server
-                            reminderManager.cancelReminderWorker(agendaItem = _taskState.value.task)
+                            //todo cancel alarm
                             _taskState.update {
                                 it.copy(isLoading = false)
                             }

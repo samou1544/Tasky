@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Attendee(
-    val name: String,
+    val fullName: String,
     val email: String,
     val isCreator: Boolean,
     val isGoing: Boolean = false,

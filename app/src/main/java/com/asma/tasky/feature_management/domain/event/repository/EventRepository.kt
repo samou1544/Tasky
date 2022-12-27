@@ -8,4 +8,6 @@ interface EventRepository {
     suspend fun getAttendee(email: String): Attendee
 
     suspend fun createEvent(event: AgendaItem.Event, photos: List<String>): AgendaItem.Event
+
+    suspend fun insertEvent(event: AgendaItem.Event)
 }

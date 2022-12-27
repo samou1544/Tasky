@@ -1,9 +1,5 @@
 package com.asma.tasky.feature_management.presentation.event
 
-import android.content.ContentResolver
-import android.net.Uri
-import androidx.core.content.FileProvider.getUriForFile
-import androidx.core.net.toFile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +18,6 @@ import com.asma.tasky.feature_management.presentation.event.util.AttendeeError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -114,7 +109,6 @@ class EventViewModel @Inject constructor(
                 _eventState.update {
                     it.copy(isLoading = true)
                 }
-                //todo save event to remote
                 createEvent()
             }
             is EventEvent.Delete -> {
@@ -234,11 +228,17 @@ class EventViewModel @Inject constructor(
     private fun createEvent() {
         viewModelScope.launch {
             when (createEventUseCase(
-                event = _eventState.value.event,
+                event = _eventState.value.event.copy(
+                    eventStartDate = DateUtil.localDateTimeToSeconds(
+                        _eventState.value.startTime
+                    ),
+                    eventEndDate = DateUtil.localDateTimeToSeconds(
+                        _eventState.value.endTime
+                    )
+                ),
                 photos = _eventState.value.photos.map { uri ->
                     uri.toString()
-                }))
-            {
+                })) {
                 is Resource.Error -> {
 
                 }

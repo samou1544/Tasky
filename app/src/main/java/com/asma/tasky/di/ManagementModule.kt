@@ -2,20 +2,13 @@ package com.asma.tasky.di
 
 import android.app.Application
 import androidx.room.Room
-import com.asma.tasky.feature_authentication.data.remote.AuthenticationApi
 import com.asma.tasky.feature_management.data.data_source.TaskyDatabase
-import com.asma.tasky.feature_management.data.remote.TaskApi
-import com.asma.tasky.feature_management.data.repository.AgendaRepositoryImpl
-import com.asma.tasky.feature_management.data.repository.TaskRepositoryImpl
+import com.asma.tasky.feature_management.data.agenda.AgendaRepositoryImpl
 import com.asma.tasky.feature_management.domain.agenda.repository.AgendaRepository
-import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -35,6 +28,6 @@ object ManagementModule {
     @Provides
     @Singleton
     fun provideAgendaRepository(db: TaskyDatabase): AgendaRepository {
-        return AgendaRepositoryImpl(db.taskyDao)
+        return AgendaRepositoryImpl(db.taskyDao, db.eventDao)
     }
 }

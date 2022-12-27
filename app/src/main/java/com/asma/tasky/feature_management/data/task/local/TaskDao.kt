@@ -1,12 +1,10 @@
-package com.asma.tasky.feature_management.data.data_source
+package com.asma.tasky.feature_management.data.task.local
 
 import androidx.room.*
-import com.asma.tasky.feature_management.domain.AgendaItem
-import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface TaskyDao {
+interface TaskDao {
 
     // todo select tasks for a given day
     @Query("SELECT * FROM taskentity WHERE startDate >=:startOfDay AND startDate<=:endOfDay")
@@ -22,11 +20,11 @@ interface TaskyDao {
     suspend fun deleteTask(task: TaskEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addModifiedTask(task: ModifiedTask): Long
+    suspend fun addModifiedTask(task: ModifiedTaskEntity): Long
 
     @Delete
-    suspend fun deleteModifiedTask(task: ModifiedTask)
+    suspend fun deleteModifiedTask(task: ModifiedTaskEntity)
 
-    @Query("SELECT * FROM modifiedtask")
-    fun getModifiedTasks(): Flow<List<ModifiedTask>>
+    @Query("SELECT * FROM modifiedtaskentity")
+    fun getModifiedTasks(): Flow<List<ModifiedTaskEntity>>
 }

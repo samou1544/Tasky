@@ -1,4 +1,4 @@
-package com.asma.tasky.feature_management.data.remote.dto
+package com.asma.tasky.feature_management.data.task.remote.dto
 
 import com.asma.tasky.feature_management.domain.AgendaItem
 
@@ -20,4 +20,15 @@ data class TaskDTO(
             taskId = id
         )
     }
+}
+
+fun AgendaItem.Task.toTaskDTO(): TaskDTO {
+    return TaskDTO(
+        id = taskId,
+        title = taskTitle,
+        description = taskDescription,
+        time = taskStartDate,
+        remindAt = taskReminder,
+        isDone = isDone,
+    )
 }

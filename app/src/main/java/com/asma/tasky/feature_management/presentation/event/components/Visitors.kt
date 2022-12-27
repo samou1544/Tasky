@@ -202,7 +202,7 @@ fun AttendeesRow(attendee: Attendee, editable: Boolean, onRemoveAttendee: (Atten
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = Util.getInitials(attendee.name),
+                    text = Util.getInitials(attendee.fullName),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
                     color = Color.White
@@ -213,7 +213,7 @@ fun AttendeesRow(attendee: Attendee, editable: Boolean, onRemoveAttendee: (Atten
             Spacer(modifier = Modifier.width(SpaceMedium))
 
             Text(
-                text = attendee.name,
+                text = attendee.fullName,
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,
                 color = Color.DarkGray

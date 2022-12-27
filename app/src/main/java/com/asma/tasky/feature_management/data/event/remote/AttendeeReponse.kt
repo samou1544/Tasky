@@ -13,7 +13,7 @@ data class Attendee(
 
 fun AttendeeResponse.toAttendee(): com.asma.tasky.feature_management.domain.event.model.Attendee {
     return com.asma.tasky.feature_management.domain.event.model.Attendee(
-        name = attendee.fullName,
+        fullName = attendee.fullName,
         email = attendee.email,
         isCreator = false,
         isGoing = true,

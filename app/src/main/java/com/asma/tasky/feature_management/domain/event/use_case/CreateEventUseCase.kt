@@ -15,14 +15,19 @@ class CreateEventUseCase @Inject constructor(
         if (event.title.isEmpty())
             return Resource.Error(message = UiText.StringResource(R.string.invalid_event))
 
-        try {
+        return try {
+
+            repository.insertEvent(event)
+
             val response = repository.createEvent(event = event, photos = photos)
 
-            //todo save result to local
-            return Resource.Success(Unit)
+            repository.insertEvent(response)
+
+            Resource.Success(Unit)
+
 
         } catch (e: Exception) {
-            return Resource.Error(message = UiText.DynamicString(e.message!!))
+            Resource.Error(message = UiText.DynamicString(e.message!!))
 
         }
 

@@ -56,5 +56,6 @@
     <string name="to">to</string>
     <string name="user_not_found">No user associated with this email found</string>
     <string name="invalid_event">Invalid Event</string>
+    <string name="invalid_Reminder">Invalid Reminder</string>
 
 </resources>
