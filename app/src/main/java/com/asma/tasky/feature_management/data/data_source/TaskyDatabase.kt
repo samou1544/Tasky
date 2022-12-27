@@ -28,7 +28,7 @@ import com.asma.tasky.feature_management.data.task.local.TaskEntity
 @TypeConverters(Converters::class)
 abstract class TaskyDatabase : RoomDatabase() {
 
-    abstract val taskyDao: TaskDao
+    abstract val taskDao: TaskDao
 
     abstract val eventDao: EventDao
 

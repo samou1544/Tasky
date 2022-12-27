@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.asma.tasky.feature_management.data.data_source.TaskyDatabase
 import com.asma.tasky.feature_management.data.agenda.AgendaRepositoryImpl
 import com.asma.tasky.feature_management.domain.agenda.repository.AgendaRepository
+import com.asma.tasky.feature_management.domain.event.repository.EventRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,7 @@ object ManagementModule {
     @Provides
     @Singleton
     fun provideAgendaRepository(db: TaskyDatabase): AgendaRepository {
-        return AgendaRepositoryImpl(db.taskyDao, db.eventDao, db.reminderDao)
+
+        return AgendaRepositoryImpl(db.taskDao, db.eventDao, db.reminderDao)
     }
 }

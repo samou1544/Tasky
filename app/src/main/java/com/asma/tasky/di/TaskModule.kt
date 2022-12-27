@@ -31,6 +31,6 @@ object TaskModule {
     @Provides
     @Singleton
     fun provideTaskRepository(db: TaskyDatabase, api: TaskApi): TaskRepository {
-        return TaskRepositoryImpl(db.taskyDao, api)
+        return TaskRepositoryImpl(db.taskDao, api)
     }
 }

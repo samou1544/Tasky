@@ -22,7 +22,6 @@ sealed class EventEvent {
     data class ReminderSelected(val reminder: Reminder) : EventEvent()
     data class PhotosAdded(val uriList: List<Uri>) : EventEvent()
     data class PhotoDeleted(val uri: Uri) : EventEvent()
-    data class ChangeStatus(val status: AttendeesStatus) : EventEvent()
     object ToggleReminderDropDown : EventEvent()
     object ToggleShowAddAttendeeDialog : EventEvent()
     object ToggleEditMode : EventEvent()

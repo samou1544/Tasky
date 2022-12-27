@@ -13,7 +13,7 @@ interface EventDao {
     suspend fun getEventById(id: String): EventEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addEvent(event: EventEntity): Long
+    suspend fun addEvent(event: EventEntity)
 
     @Delete
     suspend fun deleteEvent(event: EventEntity)
@@ -21,5 +21,10 @@ interface EventDao {
 
     @Query("SELECT * FROM modifiedevententity")
     suspend fun getModifiedEvents(): List<ModifiedEventEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addModifiedEvent(modifiedEvent: ModifiedEventEntity)
+    @Delete
+    suspend fun deleteModifiedEvent(modifiedEvent: ModifiedEventEntity)
 
 }
