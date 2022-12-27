@@ -16,10 +16,10 @@ import com.asma.tasky.feature_management.domain.util.Reminder
 import com.asma.tasky.feature_management.domain.util.ReminderUtil
 import com.asma.tasky.feature_management.presentation.event.util.AttendeeError
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
@@ -88,6 +88,7 @@ class EventViewModel @Inject constructor(
                 _eventState.update {
                     it.copy(photos = it.photos.minus(event.uri))
                 }
+
             }
             is EventEvent.TitleEntered -> {
                 _eventState.update {
@@ -111,7 +112,7 @@ class EventViewModel @Inject constructor(
                 createEvent()
             }
             is EventEvent.Delete -> {
-                // todo delete event
+                //todo delete event
             }
             is EventEvent.ToggleReminderDropDown -> {
                 _eventState.update {
@@ -226,27 +227,26 @@ class EventViewModel @Inject constructor(
 
     private fun createEvent() {
         viewModelScope.launch {
-            when (
-                createEventUseCase(
-                    event = _eventState.value.event.copy(
-                        eventStartDate = DateUtil.localDateTimeToSeconds(
-                            _eventState.value.startTime
-                        ),
-                        eventEndDate = DateUtil.localDateTimeToSeconds(
-                            _eventState.value.endTime
-                        )
+            when (createEventUseCase(
+                event = _eventState.value.event.copy(
+                    eventStartDate = DateUtil.localDateTimeToSeconds(
+                        _eventState.value.startTime
                     ),
-                    photos = _eventState.value.photos.map { uri ->
-                        uri.toString()
-                    }
-                )
-            ) {
+                    eventEndDate = DateUtil.localDateTimeToSeconds(
+                        _eventState.value.endTime
+                    )
+                ),
+                photos = _eventState.value.photos.map { uri ->
+                    uri.toString()
+                })) {
                 is Resource.Error -> {
+
                 }
                 is Resource.Success -> {
                     _eventFlow.emit(UiEvent.NavigateUp)
                 }
             }
+
         }
     }
 }

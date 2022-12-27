@@ -4,7 +4,9 @@ import com.asma.tasky.R
 import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.domain.AgendaItem
+import com.asma.tasky.feature_management.domain.event.model.ModifiedEvent
 import com.asma.tasky.feature_management.domain.event.repository.EventRepository
+import com.asma.tasky.feature_management.domain.util.ModificationType
 import javax.inject.Inject
 
 class CreateEventUseCase @Inject constructor(
@@ -19,12 +21,16 @@ class CreateEventUseCase @Inject constructor(
 
             repository.insertEvent(event)
 
-            val response = repository.createEvent(event = event, photos = photos)
+            val response = repository.createRemoteEvent(event = event, photos = photos)
 
             repository.insertEvent(response)
 
             Resource.Success(Unit)
         } catch (e: Exception) {
+            repository.insertModifiedEvent(ModifiedEvent(
+                event,
+                ModificationType.Created
+            ))
             Resource.Error(message = UiText.DynamicString(e.message!!))
         }
     }

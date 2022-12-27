@@ -40,3 +40,16 @@ fun ModifiedEvent.toModifiedEventEntity(): ModifiedEventEntity {
         attendees = event.attendees
     )
 }
+
+fun ModifiedEventEntity.toAgendaEvent(): AgendaItem.Event {
+    return AgendaItem.Event(
+        eventTitle = title,
+        eventDescription = description,
+        eventStartDate = startDate,
+        eventEndDate = endDate,
+        eventReminder = reminder,
+        eventId = id,
+        photos = photos,
+        attendees = attendees
+    )
+}
