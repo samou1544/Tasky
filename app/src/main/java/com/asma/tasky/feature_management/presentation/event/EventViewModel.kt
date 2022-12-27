@@ -47,7 +47,7 @@ class EventViewModel @Inject constructor(
         if (!eventId.isNullOrEmpty()) {
             // todo get event
         } else {
-            // this is a new task, turn on editable mode
+            // this is a new event, turn on editable mode
             _eventState.update {
                 it.copy(isEditable = true)
             }
