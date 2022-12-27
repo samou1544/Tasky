@@ -29,7 +29,6 @@ import com.asma.tasky.core.presentation.util.UiEvent
 import com.asma.tasky.core.util.asString
 import com.asma.tasky.feature_authentication.domain.util.AuthError
 import com.asma.tasky.feature_authentication.presentation.components.FormTextField
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalComposeUiApi
