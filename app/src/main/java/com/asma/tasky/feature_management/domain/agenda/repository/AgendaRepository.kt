@@ -5,6 +5,5 @@ import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 
 interface AgendaRepository {
-    fun getAgendaItems(day:LocalDate):Flow<List<AgendaItem>>
-
+    fun getAgendaItems(day: LocalDate): Flow<List<AgendaItem>>
 }

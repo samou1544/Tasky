@@ -18,7 +18,6 @@ interface ReminderDao {
     @Delete
     suspend fun deleteReminder(reminder: ReminderEntity)
 
-
     @Query("SELECT * FROM modifiedreminderentity")
     suspend fun getModifiedReminders(): List<ModifiedReminderEntity>
 }

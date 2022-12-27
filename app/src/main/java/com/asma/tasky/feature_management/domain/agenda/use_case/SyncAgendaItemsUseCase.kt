@@ -7,6 +7,6 @@ class SyncAgendaItemsUseCase @Inject constructor(
     private val repository: AgendaRepository
 ) {
     operator fun invoke() {
-         //todo sync agenda items
+        // todo sync agenda items
     }
 }

@@ -13,11 +13,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import javax.inject.Singleton
 import retrofit2.converter.moshi.MoshiConverterFactory
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -45,16 +44,20 @@ object EventModule {
             .create(EventApi::class.java)
     }
 
-
     @Provides
     @Singleton
-    fun provideEventUploader(workManager: WorkManager):EventUploader{
+    fun provideEventUploader(workManager: WorkManager): EventUploader {
         return EventUploader(workManager)
     }
 
     @Provides
     @Singleton
-    fun provideEventRepository(api: EventApi, app:Application,eventUploader: EventUploader, db: TaskyDatabase): EventRepository {
+    fun provideEventRepository(
+        api: EventApi,
+        app: Application,
+        eventUploader: EventUploader,
+        db: TaskyDatabase
+    ): EventRepository {
         return EventRepositoryImpl(api, app.contentResolver, eventUploader, db.eventDao)
     }
 }

@@ -2,8 +2,8 @@ package com.asma.tasky.di
 
 import android.app.Application
 import androidx.room.Room
-import com.asma.tasky.feature_management.data.data_source.TaskyDatabase
 import com.asma.tasky.feature_management.data.agenda.AgendaRepositoryImpl
+import com.asma.tasky.feature_management.data.data_source.TaskyDatabase
 import com.asma.tasky.feature_management.domain.agenda.repository.AgendaRepository
 import dagger.Module
 import dagger.Provides

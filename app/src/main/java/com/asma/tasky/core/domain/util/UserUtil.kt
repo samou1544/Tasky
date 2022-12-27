@@ -9,7 +9,7 @@ object UserUtil {
         val words = trimmedName.split(" ")
         var initials = ""
 
-        for(i in 0 until min(words.size,2)){
+        for (i in 0 until min(words.size, 2)) {
             val initial = words[i].firstOrNull()
             initial?.let {
                 initials += it.toString().uppercase()

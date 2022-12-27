@@ -2,12 +2,12 @@ package com.asma.tasky.feature_management.data.event.util
 
 import android.content.ContentResolver
 import android.net.Uri
+import java.io.IOException
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okio.BufferedSink
 import okio.source
-import java.io.IOException
 
 class ContentUriRequestBody(
     private val contentResolver: ContentResolver,

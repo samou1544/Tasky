@@ -3,11 +3,11 @@ package com.asma.tasky.feature_management.data.event
 import android.content.ContentResolver
 import android.net.Uri
 import com.asma.tasky.feature_management.data.event.local.EventDao
+import com.asma.tasky.feature_management.data.event.local.toEventEntity
 import com.asma.tasky.feature_management.data.event.remote.CreateEventRequest
 import com.asma.tasky.feature_management.data.event.remote.EventApi
 import com.asma.tasky.feature_management.data.event.remote.toAttendee
 import com.asma.tasky.feature_management.data.event.util.ContentUriRequestBody
-import com.asma.tasky.feature_management.data.event.local.toEventEntity
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.event.model.Attendee
 import com.asma.tasky.feature_management.domain.event.repository.EventRepository
@@ -21,7 +21,7 @@ class EventRepositoryImpl(
     private val api: EventApi,
     private val contentResolver: ContentResolver,
     private val eventUploader: EventUploader,
-    private val dao:EventDao
+    private val dao: EventDao
 ) : EventRepository {
     override suspend fun getAttendee(email: String): Attendee {
         return api.getAttendee(email).toAttendee()
@@ -32,7 +32,7 @@ class EventRepositoryImpl(
         photos: List<String>
     ): AgendaItem.Event = coroutineScope {
 
-        //event uploader should start the eventUpload worker
+        // event uploader should start the eventUpload worker
 
         val request = CreateEventRequest(
             id = event.eventId,
@@ -47,7 +47,6 @@ class EventRepositoryImpl(
         )
 
         eventUploader.startEventWorker(Gson().toJson(request), type = "create")
-
 
         val parts: List<MultipartBody.Part> = photos.map {
             val uri = Uri.parse(it)

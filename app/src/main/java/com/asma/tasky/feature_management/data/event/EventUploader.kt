@@ -23,6 +23,5 @@ class EventUploader @Inject constructor(
             .build()
 
         workManager.enqueue(work)
-
     }
 }

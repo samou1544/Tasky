@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class AgendaViewModel @Inject constructor(
     private val getAgendaItemsUseCase: GetAgendaItemsUseCase,
     private val addTaskUseCase: AddTaskUseCase,
-    private val deleteTaskUseCase:DeleteTaskUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
 ) : ViewModel() {
 
     init {
@@ -27,14 +27,13 @@ class AgendaViewModel @Inject constructor(
     private val _agendaState = MutableStateFlow(AgendaState())
     val agendaState = _agendaState.asStateFlow()
 
-     fun getAgendaItems(day: LocalDate) {
+    fun getAgendaItems(day: LocalDate) {
         getAgendaItemsUseCase(day).onEach { result ->
             _agendaState.update {
                 it.copy(items = result)
             }
         }.launchIn(viewModelScope)
     }
-
 
     fun onEvent(event: AgendaEvent) {
         when (event) {
@@ -52,8 +51,8 @@ class AgendaViewModel @Inject constructor(
             }
             is AgendaEvent.ToggleTaskIsDone -> toggleTaskDone(task = event.task)
             is AgendaEvent.DeleteItem -> {
-                when(event.item){
-                    is AgendaItem.Task->{
+                when (event.item) {
+                    is AgendaItem.Task -> {
                         deleteTask(event.item)
                     }
                     is AgendaItem.Event -> TODO()
@@ -63,14 +62,13 @@ class AgendaViewModel @Inject constructor(
         }
     }
 
-    private fun toggleTaskDone(task:AgendaItem.Task){
+    private fun toggleTaskDone(task: AgendaItem.Task) {
         viewModelScope.launch {
             addTaskUseCase(task.copy(isDone = task.isDone.not()), isNewTask = false)
         }
-
     }
 
-    private fun deleteTask(task: AgendaItem.Task){
+    private fun deleteTask(task: AgendaItem.Task) {
         viewModelScope.launch {
             deleteTaskUseCase(task)
         }

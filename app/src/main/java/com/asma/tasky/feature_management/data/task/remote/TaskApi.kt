@@ -1,8 +1,6 @@
 package com.asma.tasky.feature_management.data.task.remote
 
-import com.asma.tasky.core.data.BasicResponse
 import com.asma.tasky.feature_management.data.task.remote.dto.TaskDTO
-import retrofit2.Response
 import retrofit2.http.*
 
 interface TaskApi {

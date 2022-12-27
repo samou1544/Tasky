@@ -101,10 +101,10 @@ fun Navigation(
                 onEditTitle = {
                     navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Title.key}/$it")
                 }, onEditDescription = {
-                    navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
-                }, onNavigateUp = {
-                    navController.popBackStack()
-                }, scaffoldState = scaffoldState
+                navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
+            }, onNavigateUp = {
+                navController.popBackStack()
+            }, scaffoldState = scaffoldState
             )
         }
         composable(Screen.EventScreen.route) {
@@ -128,16 +128,16 @@ fun Navigation(
                 onEditTitle = {
                     navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Title.key}/$it")
                 }, onEditDescription = {
-                    navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
-                }, onNavigateUp = {
-                    navController.popBackStack()
-                }, scaffoldState = scaffoldState,
+                navController.navigate(Screen.EditFieldScreen.route + "/${EditableField.Description.key}/$it")
+            }, onNavigateUp = {
+                navController.popBackStack()
+            }, scaffoldState = scaffoldState,
                 openPhotoScreen = { imageUrl ->
                     val encodedImageUrl = "/${
-                        Base64.encodeToString(
-                            imageUrl.encodeToByteArray(),
-                            0
-                        )
+                    Base64.encodeToString(
+                        imageUrl.encodeToByteArray(),
+                        0
+                    )
                     }"
                     navController.navigate(
                         Screen.PhotoDetailScreen.route + encodedImageUrl

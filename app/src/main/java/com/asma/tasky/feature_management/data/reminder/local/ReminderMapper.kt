@@ -23,7 +23,6 @@ fun AgendaItem.Reminder.toReminderEntity(): ReminderEntity {
     )
 }
 
-
 fun ModifiedReminder.toModifiedReminderEntity(): ModifiedReminderEntity {
     return ModifiedReminderEntity(
         title = reminder.title,

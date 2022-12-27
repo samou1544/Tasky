@@ -13,7 +13,6 @@ class Converters {
         val moshi = Moshi.Builder().build()
         val adapter: JsonAdapter<Array<Attendee>> = moshi.adapter(Array<Attendee>::class.java)
         return adapter.toJson(value?.toTypedArray())
-
     }
 
     @TypeConverter
@@ -23,13 +22,11 @@ class Converters {
         return adapter.fromJson(value)?.toList()
     }
 
-
     @TypeConverter
     fun photoListToJson(value: List<Photo>?): String {
         val moshi = Moshi.Builder().build()
         val adapter: JsonAdapter<Array<Photo>> = moshi.adapter(Array<Photo>::class.java)
         return adapter.toJson(value?.toTypedArray())
-
     }
 
     @TypeConverter

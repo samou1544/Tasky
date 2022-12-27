@@ -69,8 +69,6 @@ fun Visitors(
                 )
             }
 //
-
-
         }
         Spacer(modifier = Modifier.height(SpaceLarge))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -93,7 +91,6 @@ fun Visitors(
 
                 )
             }
-
         }
 
         when (selected) {
@@ -132,7 +129,6 @@ fun Visitors(
                             onRemoveAttendee = onRemoveAttendee
                         )
                     }
-
             }
             is AttendeesStatus.Going -> {
                 Column(
@@ -177,8 +173,6 @@ fun AttendeesList(
             Spacer(modifier = Modifier.height(SpaceSmall))
         }
     }
-
-
 }
 
 @Composable
@@ -207,7 +201,6 @@ fun AttendeesRow(attendee: Attendee, editable: Boolean, onRemoveAttendee: (Atten
                     fontSize = 12.sp,
                     color = Color.White
                 )
-
             }
 
             Spacer(modifier = Modifier.width(SpaceMedium))
@@ -227,18 +220,15 @@ fun AttendeesRow(attendee: Attendee, editable: Boolean, onRemoveAttendee: (Atten
                 fontSize = 14.sp,
                 color = LightBlue
             )
-        else
-            if (editable)
-                IconButton(onClick = {
-                    onRemoveAttendee(attendee)
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Delete Attendee",
-                        tint = Color.DarkGray
-                    )
-                }
-
+        else if (editable)
+            IconButton(onClick = {
+                onRemoveAttendee(attendee)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.DeleteOutline,
+                    contentDescription = "Delete Attendee",
+                    tint = Color.DarkGray
+                )
+            }
     }
-
 }

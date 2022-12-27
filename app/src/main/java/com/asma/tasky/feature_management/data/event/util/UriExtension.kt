@@ -5,8 +5,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import java.io.FileNotFoundException
 
-fun Uri.length(contentResolver: ContentResolver)
-        : Long {
+fun Uri.length(contentResolver: ContentResolver): Long {
 
     val assetFileDescriptor = try {
         contentResolver.openAssetFileDescriptor(this, "r")

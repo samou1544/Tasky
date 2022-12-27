@@ -1,7 +1,6 @@
 package com.asma.tasky.feature_management.domain.reminder.repository
 
 import com.asma.tasky.feature_management.domain.AgendaItem
-import com.asma.tasky.feature_management.domain.task.model.ModifiedTask
 
 interface ReminderRepository {
 
@@ -18,6 +17,4 @@ interface ReminderRepository {
     suspend fun updateRemoteReminder(reminder: AgendaItem.Reminder)
 
     suspend fun deleteRemoteReminder(reminderId: String)
-
-
 }

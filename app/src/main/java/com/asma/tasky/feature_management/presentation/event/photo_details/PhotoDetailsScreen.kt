@@ -23,13 +23,16 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.asma.tasky.R
 import com.asma.tasky.core.presentation.ui.theme.SpaceLarge
-import okio.ByteString.Companion.decodeBase64
 import java.nio.charset.Charset
+import okio.ByteString.Companion.decodeBase64
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun PhotoDetailsScreen(
-    imageLoader: ImageLoader, imageUrl: String, onClose: () -> (Unit), onDelete: (String) -> (Unit)
+    imageLoader: ImageLoader,
+    imageUrl: String,
+    onClose: () -> (Unit),
+    onDelete: (String) -> (Unit)
 ) {
     val decodedImageUrl = remember {
         imageUrl.decodeBase64()?.string(Charset.defaultCharset())
@@ -61,7 +64,7 @@ fun PhotoDetailsScreen(
             )
 
             IconButton(onClick = {
-                onDelete(decodedImageUrl?:"")
+                onDelete(decodedImageUrl ?: "")
             }) {
                 Icon(
                     imageVector = Icons.Outlined.DeleteOutline,
@@ -71,16 +74,20 @@ fun PhotoDetailsScreen(
             }
         }
 
-        Image(modifier = Modifier
-            .fillMaxWidth()
-            .padding(SpaceLarge),
-            painter = rememberImagePainter(data = decodedImageUrl,
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(SpaceLarge),
+            painter = rememberImagePainter(
+                data = decodedImageUrl,
                 imageLoader = imageLoader,
                 builder = {
                     placeholder(R.drawable.ic_launcher_background)
                     error(R.drawable.ic_launcher_background)
-                }),
+                }
+            ),
             contentDescription = "",
-            contentScale = ContentScale.FillWidth)
+            contentScale = ContentScale.FillWidth
+        )
     }
 }

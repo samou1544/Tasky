@@ -20,5 +20,4 @@ object Constants {
     const val PARAM_DELETED_IMAGE = "deletedImage"
 
     const val KEY_DESCRIPTION = "description"
-
 }

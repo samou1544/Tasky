@@ -76,14 +76,11 @@ fun AddAttendeeDialog(
                 isCheckMarkDisplayed = isEmailValid == true
             )
 
-
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(SpaceLarge)
             ) {
-
 
                 Button(
                     onClick = onCancel,
