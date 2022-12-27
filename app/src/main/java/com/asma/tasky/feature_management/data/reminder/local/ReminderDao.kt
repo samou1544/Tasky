@@ -1,14 +1,13 @@
 package com.asma.tasky.feature_management.data.reminder.local
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReminderDao {
 
     // todo select tasks for a given day
     @Query("SELECT * FROM reminderentity WHERE startDate >=:startOfDay AND startDate<=:endOfDay")
-    fun getRemindersOfTheDay(startOfDay: Long, endOfDay: Long): Flow<List<ReminderEntity>>
+    suspend fun getRemindersOfTheDay(startOfDay: Long, endOfDay: Long): List<ReminderEntity>
 
     @Query("SELECT * FROM reminderentity WHERE id = :id")
     suspend fun getReminderById(id: String): ReminderEntity?
@@ -21,5 +20,5 @@ interface ReminderDao {
 
 
     @Query("SELECT * FROM modifiedreminderentity")
-    fun getModifiedReminders(): Flow<List<ModifiedReminderEntity>>
+    suspend fun getModifiedReminders(): List<ModifiedReminderEntity>
 }

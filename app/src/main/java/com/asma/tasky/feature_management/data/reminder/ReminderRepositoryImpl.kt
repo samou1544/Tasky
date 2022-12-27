@@ -25,7 +25,7 @@ class ReminderRepositoryImpl(
         dao.deleteReminder(reminder = reminder.toReminderEntity())
     }
 
-    override suspend fun getRemoteReminderById(id: String): AgendaItem.Reminder? {
+    override suspend fun getRemoteReminderById(id: String): AgendaItem.Reminder {
         return api.getReminder(id).toAgendaItem()
     }
 

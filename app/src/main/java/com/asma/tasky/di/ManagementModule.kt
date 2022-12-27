@@ -28,6 +28,6 @@ object ManagementModule {
     @Provides
     @Singleton
     fun provideAgendaRepository(db: TaskyDatabase): AgendaRepository {
-        return AgendaRepositoryImpl(db.taskyDao, db.eventDao)
+        return AgendaRepositoryImpl(db.taskyDao, db.eventDao, db.reminderDao)
     }
 }

@@ -1,14 +1,13 @@
 package com.asma.tasky.feature_management.data.task.local
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
 
     // todo select tasks for a given day
     @Query("SELECT * FROM taskentity WHERE startDate >=:startOfDay AND startDate<=:endOfDay")
-    fun getTasksOfTheDay(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
+    suspend fun getTasksOfTheDay(startOfDay: Long, endOfDay: Long): List<TaskEntity>
 
     @Query("SELECT * FROM taskentity WHERE id = :id")
     suspend fun getTaskById(id: String): TaskEntity?
@@ -26,5 +25,5 @@ interface TaskDao {
     suspend fun deleteModifiedTask(task: ModifiedTaskEntity)
 
     @Query("SELECT * FROM modifiedtaskentity")
-    fun getModifiedTasks(): Flow<List<ModifiedTaskEntity>>
+    suspend fun getModifiedTasks(): List<ModifiedTaskEntity>
 }

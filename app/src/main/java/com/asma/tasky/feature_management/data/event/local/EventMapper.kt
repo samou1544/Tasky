@@ -40,3 +40,4 @@ fun ModifiedEvent.toModifiedEventEntity(): ModifiedEventEntity {
         attendees = event.attendees
     )
 }
+

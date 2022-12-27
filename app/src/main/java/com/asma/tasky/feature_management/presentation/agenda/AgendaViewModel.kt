@@ -27,7 +27,7 @@ class AgendaViewModel @Inject constructor(
     private val _agendaState = MutableStateFlow(AgendaState())
     val agendaState = _agendaState.asStateFlow()
 
-    private fun getAgendaItems(day: LocalDate) {
+     fun getAgendaItems(day: LocalDate) {
         getAgendaItemsUseCase(day).onEach { result ->
             _agendaState.update {
                 it.copy(items = result)
