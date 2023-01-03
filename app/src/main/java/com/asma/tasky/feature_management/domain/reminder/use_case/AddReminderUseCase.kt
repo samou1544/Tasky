@@ -5,9 +5,9 @@ import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.reminder.repository.ReminderRepository
-import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import retrofit2.HttpException
 
 class AddReminderUseCase @Inject constructor(
     private val repository: ReminderRepository
@@ -34,7 +34,6 @@ class AddReminderUseCase @Inject constructor(
         }
         return Resource.Success(Unit)
     }
-
 
     private suspend fun saveModifiedReminder(reminder: AgendaItem.Reminder, newReminder: Boolean) {
 //        val modifiedReminder = ModifiedReminder(

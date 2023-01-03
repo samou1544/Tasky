@@ -6,13 +6,11 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.asma.tasky.R
-import com.asma.tasky.core.presentation.MainActivity
 import com.asma.tasky.feature_management.domain.AgendaItem
 
-class ReminderNotificationService (private val context: Context) {
+class ReminderNotificationService(private val context: Context) {
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

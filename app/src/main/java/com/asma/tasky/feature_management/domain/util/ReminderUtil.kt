@@ -2,7 +2,7 @@ package com.asma.tasky.feature_management.domain.util
 
 object ReminderUtil {
 
-     fun computeReminder(reminderTime: Long, startTime: Long): Reminder {
+    fun computeReminder(reminderTime: Long, startTime: Long): Reminder {
         return when (startTime - reminderTime) {
             Reminder.OneHourBefore.seconds -> {
                 Reminder.OneHourBefore

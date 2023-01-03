@@ -26,16 +26,12 @@ class CreateEventUseCase @Inject constructor(
             repository.insertEvent(response)
 
             Resource.Success(Unit)
-
-
         } catch (e: Exception) {
             repository.insertModifiedEvent(ModifiedEvent(
                 event,
                 ModificationType.Created
             ))
             Resource.Error(message = UiText.DynamicString(e.message!!))
-
         }
-
     }
 }

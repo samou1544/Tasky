@@ -3,7 +3,6 @@ package com.asma.tasky.feature_management.data.reminder.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
 @Entity
 data class ReminderEntity(
     val title: String,

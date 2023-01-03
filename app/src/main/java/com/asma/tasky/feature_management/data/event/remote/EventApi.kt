@@ -11,8 +11,8 @@ interface EventApi {
     @Multipart
     @POST("/event")
     suspend fun createEvent(
-        @Part eventData:MultipartBody.Part,
-        @Part eventPhotos:List<MultipartBody.Part>
+        @Part eventData: MultipartBody.Part,
+        @Part eventPhotos: List<MultipartBody.Part>
     ): CreateEventResponse
 
     companion object {

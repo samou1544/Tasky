@@ -91,7 +91,7 @@ fun AgendaListItem(
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
                     Text(
-                        text = item.description?: "" ,
+                        text = item.description ?: "",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Light,
                         color = textColor

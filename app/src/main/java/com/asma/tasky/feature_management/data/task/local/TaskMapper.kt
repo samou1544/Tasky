@@ -25,7 +25,6 @@ fun AgendaItem.Task.toTaskEntity(): TaskEntity {
     )
 }
 
-
 fun ModifiedTask.toModifiedTaskEntity(): ModifiedTaskEntity {
     return ModifiedTaskEntity(
         title = task.title,

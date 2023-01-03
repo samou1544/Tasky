@@ -38,7 +38,6 @@ import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.flow.collectLatest
-import java.io.File
 
 @Composable
 fun EventScreen(
@@ -66,7 +65,6 @@ fun EventScreen(
             viewModel.onEvent(EventEvent.PhotosAdded(uriList))
         }
     val state by viewModel.eventState.collectAsState()
-
 
     val goingAttendees = remember(state.event.attendees) {
         state.event.attendees.filter { attendee ->
@@ -236,7 +234,6 @@ fun EventScreen(
                         .padding(top = SpaceMedium),
                     thickness = 1.dp, color = Color.LightGray
                 )
-
 
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 // start time

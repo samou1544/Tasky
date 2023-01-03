@@ -27,7 +27,6 @@ fun DeleteAlertDialog(onCancel: () -> Unit, onDelete: () -> Unit, text: String) 
                     .padding(SpaceLarge)
             ) {
 
-
                 Button(
                     onClick = onCancel,
                     modifier = Modifier.weight(1f),

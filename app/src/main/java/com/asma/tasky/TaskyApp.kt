@@ -34,7 +34,6 @@ class TaskyApp : Application(), Configuration.Provider {
         notificationManager.createNotificationChannel(channel)
     }
 
-
     override fun getWorkManagerConfiguration() =
         Configuration.Builder()
             .setWorkerFactory(workerFactory)

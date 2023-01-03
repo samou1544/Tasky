@@ -1,8 +1,8 @@
 package com.asma.tasky.di
 
 import com.asma.tasky.feature_management.data.data_source.TaskyDatabase
-import com.asma.tasky.feature_management.data.task.remote.TaskApi
 import com.asma.tasky.feature_management.data.task.TaskRepositoryImpl
+import com.asma.tasky.feature_management.data.task.remote.TaskApi
 import com.asma.tasky.feature_management.domain.task.repository.TaskRepository
 import dagger.Module
 import dagger.Provides

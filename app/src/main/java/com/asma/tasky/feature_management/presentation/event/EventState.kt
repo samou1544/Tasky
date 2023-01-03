@@ -3,8 +3,8 @@ package com.asma.tasky.feature_management.presentation.event
 import android.net.Uri
 import com.asma.tasky.core.domain.states.TextFieldState
 import com.asma.tasky.feature_management.domain.AgendaItem
-import com.asma.tasky.feature_management.domain.event.model.Attendee
 import com.asma.tasky.feature_management.domain.util.Reminder
+import com.asma.tasky.feature_management.presentation.event.components.AttendeesStatus
 import java.time.LocalDateTime
 
 data class EventState(
@@ -18,8 +18,8 @@ data class EventState(
     val reminder: Reminder = Reminder.OneHourBefore,
     val photos: List<Uri> = emptyList(),
     val selectedAttendeeStatus: AttendeesStatus = AttendeesStatus.All,
-    val showAddAttendeeDialog:Boolean = false,
-    val attendeeEmail:TextFieldState = TextFieldState(),
-    val isAttendeeEmailValid:Boolean? = null,
-    val isCheckingAttendeeEmail:Boolean = false,
+    val showAddAttendeeDialog: Boolean = false,
+    val attendeeEmail: TextFieldState = TextFieldState(),
+    val isAttendeeEmailValid: Boolean? = null,
+    val isCheckingAttendeeEmail: Boolean = false,
 )

@@ -49,7 +49,6 @@ fun AgendaScreen(
         mutableStateOf(false)
     }
 
-
     var selectedItem: AgendaItem by remember {
         mutableStateOf(AgendaItem.Task())
     }
@@ -62,7 +61,7 @@ fun AgendaScreen(
         state.items.filter { it.startDate >= System.currentTimeMillis() / 1000 }
     }
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         viewModel.getAgendaItems(state.selectedDate.toLocalDate())
     }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -232,8 +231,5 @@ fun AgendaScreen(
                     text = text
                 )
             }
-
-
     }
 }
-

@@ -3,9 +3,9 @@ package com.asma.tasky.feature_management.domain.reminder.use_case
 import com.asma.tasky.core.util.Resource
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.reminder.repository.ReminderRepository
-import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import retrofit2.HttpException
 
 class DeleteReminderUseCase @Inject constructor(
     private val repository: ReminderRepository
@@ -23,7 +23,6 @@ class DeleteReminderUseCase @Inject constructor(
             saveModifiedReminder(reminder = reminder)
         }
         return Resource.Success(Unit)
-
     }
 
     private suspend fun saveModifiedReminder(reminder: AgendaItem.Reminder) {
@@ -33,5 +32,4 @@ class DeleteReminderUseCase @Inject constructor(
 //        )
 //        repository.saveModifiedReminder(modifiedReminder)
     }
-
 }

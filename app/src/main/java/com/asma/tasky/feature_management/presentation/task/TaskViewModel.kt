@@ -14,10 +14,10 @@ import com.asma.tasky.feature_management.domain.task.use_case.GetTaskUseCase
 import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.domain.util.Reminder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
@@ -133,7 +133,7 @@ class TaskViewModel @Inject constructor(
                 viewModelScope.launch {
                     when (val result = addTaskUseCase(task = task, isNewTask = isNewTask)) {
                         is Resource.Success -> {
-                            //todo set alarm
+                            // todo set alarm
                             _eventFlow.emit(UiEvent.NavigateUp)
                         }
                         is Resource.Error -> {
@@ -153,12 +153,11 @@ class TaskViewModel @Inject constructor(
                 viewModelScope.launch {
                     when (val result = deleteTaskUseCase(_taskState.value.task)) {
                         is Resource.Success -> {
-                            //todo cancel alarm
+                            // todo cancel alarm
                             _taskState.update {
                                 it.copy(isLoading = false)
                             }
                             _eventFlow.emit(UiEvent.NavigateUp)
-
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(
@@ -212,6 +211,4 @@ class TaskViewModel @Inject constructor(
             }
         }
     }
-
-
 }

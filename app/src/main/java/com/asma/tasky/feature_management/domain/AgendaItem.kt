@@ -3,9 +3,8 @@ package com.asma.tasky.feature_management.domain
 import android.os.Parcelable
 import com.asma.tasky.feature_management.domain.event.model.Attendee
 import com.asma.tasky.feature_management.domain.event.model.Photo
-import kotlinx.parcelize.Parcelize
 import java.util.*
-
+import kotlinx.parcelize.Parcelize
 
 sealed class AgendaItem(
     val id: String,
@@ -64,4 +63,3 @@ sealed class AgendaItem(
         reminder = reminderReminder
     )
 }
-

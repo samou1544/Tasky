@@ -4,9 +4,9 @@ import com.asma.tasky.core.util.Resource
 import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.reminder.repository.ReminderRepository
-import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import retrofit2.HttpException
 
 class GetReminderUseCase @Inject constructor(
     private val repository: ReminderRepository
@@ -30,7 +30,6 @@ class GetReminderUseCase @Inject constructor(
                 if (e.message != null) UiText.DynamicString(e.message!!)
                 else UiText.unknownError()
             )
-
         } catch (e: HttpException) {
             e.printStackTrace()
 
@@ -38,7 +37,6 @@ class GetReminderUseCase @Inject constructor(
                 if (e.message != null) UiText.DynamicString(e.message!!)
                 else UiText.unknownError()
             )
-
         }
     }
 }
