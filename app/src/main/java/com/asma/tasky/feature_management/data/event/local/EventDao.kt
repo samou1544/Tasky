@@ -18,7 +18,6 @@ interface EventDao {
     @Delete
     suspend fun deleteEvent(event: EventEntity)
 
-
     @Query("SELECT * FROM modifiedevententity")
     suspend fun getModifiedEvents(): List<ModifiedEventEntity>
 
@@ -26,5 +25,4 @@ interface EventDao {
     suspend fun addModifiedEvent(modifiedEvent: ModifiedEventEntity)
     @Delete
     suspend fun deleteModifiedEvent(modifiedEvent: ModifiedEventEntity)
-
 }

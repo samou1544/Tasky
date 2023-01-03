@@ -140,10 +140,10 @@ fun Navigation(
                 scaffoldState = scaffoldState,
                 openPhotoScreen = { imageUrl ->
                     val encodedImageUrl = "/${
-                        Base64.encodeToString(
-                            imageUrl.encodeToByteArray(),
-                            0
-                        )
+                    Base64.encodeToString(
+                        imageUrl.encodeToByteArray(),
+                        0
+                    )
                     }"
                     navController.navigate(
                         Screen.PhotoDetailScreen.route + encodedImageUrl

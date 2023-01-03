@@ -3,8 +3,6 @@ package com.asma.tasky.feature_management.data.event
 import android.content.ContentResolver
 import android.net.Uri
 import com.asma.tasky.feature_management.data.event.local.EventDao
-import com.asma.tasky.feature_management.data.event.local.toEventEntity
-import com.asma.tasky.feature_management.data.event.local.toModifiedEventEntity
 import com.asma.tasky.feature_management.data.event.remote.CreateEventRequest
 import com.asma.tasky.feature_management.data.event.remote.EventApi
 import com.asma.tasky.feature_management.data.event.remote.toAttendee
@@ -109,6 +107,4 @@ class EventRepositoryImpl(
     override suspend fun insertModifiedEvent(modifiedEvent: ModifiedEvent) {
         dao.addModifiedEvent(modifiedEvent.toModifiedEventEntity())
     }
-
-
 }
