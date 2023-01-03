@@ -6,11 +6,13 @@ import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.agenda.use_case.GetAgendaItemsUseCase
 import com.asma.tasky.feature_management.domain.task.use_case.AddTaskUseCase
 import com.asma.tasky.feature_management.domain.task.use_case.DeleteTaskUseCase
+import com.asma.tasky.feature_management.domain.util.CacheResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
-import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import javax.inject.Inject
 
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
@@ -19,18 +21,39 @@ class AgendaViewModel @Inject constructor(
     private val deleteTaskUseCase: DeleteTaskUseCase,
 ) : ViewModel() {
 
+    private val _agendaState = MutableStateFlow(AgendaState())
+    val agendaState = _agendaState.asStateFlow()
+
+    private var getAgendaItemsJob: Job? = null
+
     init {
         // todo get username
         getAgendaItems(LocalDate.now())
     }
 
-    private val _agendaState = MutableStateFlow(AgendaState())
-    val agendaState = _agendaState.asStateFlow()
 
-    fun getAgendaItems(day: LocalDate) {
-        getAgendaItemsUseCase(day).onEach { result ->
-            _agendaState.update {
-                it.copy(items = result)
+    fun getAgendaItems(day: LocalDate, cacheOnly: Boolean = false) {
+        getAgendaItemsJob?.cancel()
+        getAgendaItemsJob = getAgendaItemsUseCase(day, cacheOnly).onEach { result ->
+            when (result) {
+                is CacheResult.Local,
+                is CacheResult.Remote -> {
+                    val items = result.data ?: emptyList()
+                    _agendaState.update {
+                        it.copy(
+                            items = items,
+                            isLoading = false
+                        )
+                    }
+                }
+                is CacheResult.Error -> {
+                    _agendaState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                }
+                is CacheResult.Unauthorized -> logout()
             }
         }.launchIn(viewModelScope)
     }
@@ -72,5 +95,9 @@ class AgendaViewModel @Inject constructor(
         viewModelScope.launch {
             deleteTaskUseCase(task)
         }
+    }
+
+    private fun logout() {
+        //todo
     }
 }

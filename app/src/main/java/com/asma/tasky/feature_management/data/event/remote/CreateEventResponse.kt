@@ -14,7 +14,6 @@ data class CreateEventResponse(
     val attendees: List<EventResponseAttendee>,
     val photos: List<Photo>
 )
-
 data class EventResponseAttendee(
     val email: String,
     val fullName: String,

@@ -1,40 +1,52 @@
 package com.asma.tasky.feature_management.data.agenda
 
-import com.asma.tasky.core.util.Resource
+import com.asma.tasky.core.domain.auth.AuthResult
+import com.asma.tasky.core.util.UiText
 import com.asma.tasky.feature_management.data.event.local.EventDao
 import com.asma.tasky.feature_management.data.event.local.ModifiedEventEntity
-import com.asma.tasky.feature_management.data.event.local.toAgendaEvent
+import com.asma.tasky.feature_management.data.event.remote.EventApi
+import com.asma.tasky.feature_management.data.event.toAgendaEvent
+import com.asma.tasky.feature_management.data.event.toCreateEventRequest
 import com.asma.tasky.feature_management.data.reminder.local.ReminderDao
 import com.asma.tasky.feature_management.data.reminder.local.toAgendaReminder
 import com.asma.tasky.feature_management.data.task.local.TaskDao
 import com.asma.tasky.feature_management.data.task.local.toAgendaTask
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.agenda.repository.AgendaRepository
+import com.asma.tasky.feature_management.domain.util.CacheResult
 import com.asma.tasky.feature_management.domain.util.DateUtil
 import com.asma.tasky.feature_management.domain.util.ModificationType
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.temporal.ChronoField
+import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import okhttp3.MultipartBody
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.temporal.ChronoField
 
 class AgendaRepositoryImpl(
     private val taskDao: TaskDao,
     private val eventDao: EventDao,
     private val reminderDao: ReminderDao,
+    private val eventApi: EventApi
 ) :
     AgendaRepository {
 
-    override fun getAgendaItems(day: LocalDate): Flow<List<AgendaItem>> = flow {
-        emit(getLocalAgenda(day))
+    override fun getAgendaItems(
+        day: LocalDate,
+        cacheOnly: Boolean
+    ): Flow<CacheResult<List<AgendaItem>>> = flow {
+        emit(CacheResult.Local(getLocalAgenda(day)))
+        if (cacheOnly) return@flow
 
         // sync cache
-        when (syncAgenda()) {
-            is Resource.Error -> {}
-            is Resource.Success -> {
-            }
+        when (val result = syncAgenda()) {
+            is AuthResult.Error -> emit(CacheResult.Error(result.message ?: UiText.unknownError()))
+            is AuthResult.Success -> emit(CacheResult.Remote(result.data ?: emptyList()))
+            is AuthResult.Unauthorized -> emit(CacheResult.Unauthorized())
         }
     }
 
@@ -66,14 +78,27 @@ class AgendaRepositoryImpl(
         (events + tasks + reminders).sortedBy { it.startDate }
     }
 
-    private suspend fun syncAgenda(): Resource<List<AgendaItem>> = supervisorScope {
+    private suspend fun syncAgenda(): AuthResult<List<AgendaItem>> = supervisorScope {
 
         val modifiedEventsDeferred = async { eventDao.getModifiedEvents() }
         val modifiedTasksDeferred = async { taskDao.getModifiedTasks() }
         val modifiedRemindersDeferred = async { reminderDao.getModifiedReminders() }
 
-        val modifiedEvents = modifiedEventsDeferred.await().map {
+        val modifiedEvents = modifiedEventsDeferred.await()
+
+        val createdEvents = modifiedEvents.filter {
+            it.modificationType == ModificationType.Created.value
         }
+
+        val updatedEvents = modifiedEvents.filter {
+            it.modificationType == ModificationType.Updated.value
+        }
+
+        val deletedEvents = modifiedEvents.filter {
+            it.modificationType == ModificationType.Deleted.value
+        }
+
+
         val modifiedTasks = modifiedTasksDeferred.await()
         val modifiedReminders = modifiedRemindersDeferred.await()
 
@@ -85,19 +110,48 @@ class AgendaRepositoryImpl(
 
         // get AgendaItems from remote
 
-        Resource.Success(emptyList())
+        AuthResult.Success(emptyList())
     }
 
     private fun updateLocalAgenda(items: List<AgendaItem>) {
     }
 
-    private fun syncModifiedEvents(modifiedEvents: List<ModifiedEventEntity>) {
-        val createdEvents = modifiedEvents.filter {
-            it.modificationType == ModificationType.Created.value
+    private suspend fun syncCreatedEvents(createdEvents: List<ModifiedEventEntity>) =
+        supervisorScope {
+
+            createdEvents.map { event ->
+                launch {
+                    eventDao.getEventById(event.id)?.toAgendaEvent()?.toCreateEventRequest()
+                        ?.let { request ->
+                            eventApi.createEvent(
+                                eventData = MultipartBody.Part
+                                    .createFormData(
+                                        "create_event_request",
+                                        Gson().toJson(request)
+                                    ),
+                                eventPhotos = emptyList()
+                            )
+
+                            eventDao.deleteModifiedEvent(modifiedEvent = event)
+                        }
+                }
+            }.forEach {
+                it.join()
+            }
+
         }
 
-        val updatedEvents = modifiedEvents.filter {
-            it.modificationType == ModificationType.Updated.value
+    private suspend fun syncUpdatedEvents(createdEvents: List<ModifiedEventEntity>) =
+        supervisorScope {
+
+            createdEvents.map { event ->
+                launch {
+                    //todo should be to update event request
+                    eventDao.getEventById(event.id)?.toAgendaEvent()?.toCreateEventRequest()
+                }
+            }.forEach {
+                it.join()
+            }
+
         }
-    }
 }

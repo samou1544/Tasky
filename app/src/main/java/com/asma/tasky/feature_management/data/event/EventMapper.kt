@@ -1,5 +1,8 @@
-package com.asma.tasky.feature_management.data.event.local
+package com.asma.tasky.feature_management.data.event
 
+import com.asma.tasky.feature_management.data.event.local.EventEntity
+import com.asma.tasky.feature_management.data.event.local.ModifiedEventEntity
+import com.asma.tasky.feature_management.data.event.remote.CreateEventRequest
 import com.asma.tasky.feature_management.domain.AgendaItem
 import com.asma.tasky.feature_management.domain.event.model.ModifiedEvent
 
@@ -27,6 +30,21 @@ fun AgendaItem.Event.toEventEntity(): EventEntity {
     )
 }
 
+fun AgendaItem.Event.toCreateEventRequest(): CreateEventRequest {
+    return CreateEventRequest(
+        id = eventId,
+        title = eventTitle,
+        description = eventDescription,
+        from = eventStartDate,
+        to = eventEndDate,
+        remindAt = eventReminder,
+        attendeeIds = attendees.map {
+            it.userId
+        }
+    )
+}
+
+
 fun ModifiedEvent.toModifiedEventEntity(): ModifiedEventEntity {
     return ModifiedEventEntity(
         title = event.title,
@@ -53,3 +71,5 @@ fun ModifiedEventEntity.toAgendaEvent(): AgendaItem.Event {
         attendees = attendees
     )
 }
+
+
